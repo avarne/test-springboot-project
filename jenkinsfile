@@ -1,0 +1,62 @@
+pipeline {
+    agent any
+    stages {
+    	stage(PreRequisite){
+    		steps{
+    			echo 'Create build eform in SE'
+    			sleep 5
+    		}
+    	}
+        stage('Compile') {
+            steps {
+                echo 'Code Compilation started'
+                sleep 10
+            }
+        }
+        stage('Feedback') {
+            steps {
+                echo 'Feedback to SE'
+                sleep 10
+            }
+        }
+      	stage('UnitTest'){
+	        parallel{        	
+		        stage('Junit') {
+		            steps {
+		                echo 'Junit execution started'
+		                sleep 5
+		                
+		                echo 'Report Parsing started'
+		                sleep 5
+
+		                echo 'Feedback to SE for Junit'
+		                sleep 10
+		            }
+		        }
+		        stage('SonarQube') {
+		            steps {
+		                echo 'SonarQube execution started'
+		                sleep 5
+		                
+		                echo 'SonarQube Report Parsing started'
+		                sleep 5
+
+		                echo 'Feedback to SE for SonarQube'
+		                sleep 5
+		            }
+		        }
+	        }
+	    }                
+    }
+    post{        	
+        	failure{
+        		echo 'update build status as failure in SE'
+        	}
+        	success{
+        		echo 'update build status as success in SE'
+        	}
+        	aborted{
+        		echo 'update build status as aborted in SE'
+        	}
+        }
+}
