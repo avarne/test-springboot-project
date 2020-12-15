@@ -1,62 +1,55 @@
-pipeline {
-    agent any
-    stages {
-    	stage(PreRequisite){
-    		steps{
-    			echo 'Create build eform in SE'
-    			sleep 5
-    		}
-    	}
-        stage('Compile') {
-            steps {
-                echo 'Code Compilation started'
-                sleep 10
-            }
-        }
-        stage('Feedback') {
-            steps {
-                echo 'Feedback to SE'
-                sleep 10
-            }
-        }
-      	stage('UnitTest'){
-	        parallel{        	
-		        stage('Junit') {
-		            steps {
-		                echo 'Junit execution started'
-		                sleep 5
-		                
-		                echo 'Report Parsing started'
-		                sleep 5
+pipeline
+{
+	agent 
+	    {
+	        label 'master'
+	    }          
+	/*{
+		docker
+			{
+				image 'ibm_pilot:1'
+				label 'master'
+				args "-u 0 -v /data/ibm_jenkins_data/workspace/TestingPipeline/jenkins:/data/jenkins -e 'TZ=Asia/Kolkata'"
+			}
+	}*/
 
-		                echo 'Feedback to SE for Junit'
-		                sleep 10
-		            }
-		        }
-		        stage('SonarQube') {
-		            steps {
-		                echo 'SonarQube execution started'
-		                sleep 5
-		                
-		                echo 'SonarQube Report Parsing started'
-		                sleep 5
+	stages
+		{
+			stage('Clone repo')
+				{
+					steps
+						{
+							echo "git clone repo"
+							sh "resources/test.sh"  /*https://SuneelDigite:%24Plash919798@github.com/CAS-IBM/spring-boot-mvn-courses.git*/
+						}
+				}
 
-		                echo 'Feedback to SE for SonarQube'
-		                sleep 5
-		            }
-		        }
-	        }
-	    }                
-    }
-    post{        	
-        	failure{
-        		echo 'update build status as failure in SE'
-        	}
-        	success{
-        		echo 'update build status as success in SE'
-        	}
-        	aborted{
-        		echo 'update build status as aborted in SE'
-        	}
-        }
+			stage('Run Maven Junit')
+				{
+					steps
+						{
+							echo "execute junit"
+							sh "cd /data/spring-boot-mvn-courses && mvn clean test"
+						}
+
+				}
+
+			stage('Run Sonar')
+				{	
+					steps
+						{
+							echo "execute Sonar"
+							sh "cd /data/spring-boot-mvn-courses && mvn sonar:sonar -Dsonar.projectKey=spring-boot-mvn-courses -Dsonar.host.url=https://ibm-sonar.digite.com -Dsonar.login=7a0da1e648e56a6bfce26777c747b5cf6e0320e4"
+						}
+				}
+
+			stage('Create Artifact')
+				{
+					steps
+						{
+							echo "Create Artifact"
+							sh "cd /data/spring-boot-mvn-courses && mvn clean install"
+						}
+				}		
+		}
 }
