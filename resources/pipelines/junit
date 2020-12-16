@@ -12,8 +12,8 @@ pipeline
 							{
 								echo "execute junit tests"
 								sh "mvn clean test"
-								sh "cd /var/jenkins_home/workspace/TestingPipeline/target/surefire-reports && zip -r junitresults.zip ."
-								sh "aws s3 cp junitresults.zip s3://ibmpilot/junit/junitresults.zip"
+								/*sh "cd /var/jenkins_home/workspace/TestingPipeline/target/surefire-reports && zip -r junitresults.zip ."
+								sh "aws s3 cp junitresults.zip s3://ibmpilot/junit/junitresults.zip"*/
 							}
 
 					}
@@ -33,7 +33,7 @@ pipeline
 							{
 								echo "Create Artifact"
 								sh "mvn clean install"
-								sh "cd /var/jenkins_home/workspace/TestingPipeline/target && aws s3 cp student-services-0.0.1-SNAPSHOT.jar s3://ibmpilot/artefact/ENTPservice.jar"
+								/*sh "cd /var/jenkins_home/workspace/TestingPipeline/target && aws s3 cp student-services-0.0.1-SNAPSHOT.jar s3://ibmpilot/artefact/ENTPservice.jar"*/
 							}
 					}		
 			}
