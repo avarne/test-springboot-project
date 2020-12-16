@@ -1,0 +1,37 @@
+pipeline
+	{
+		agent 
+			{
+				label 'master'
+			}
+		stages
+			{
+				stage('Run Maven Junit')
+					{
+						steps
+							{
+								echo "execute junit"
+								sh "mvn clean test"
+							}
+
+					}
+
+				stage('Run Sonar')
+					{	
+						steps
+							{
+								echo "execute Sonar"
+								sh "mvn sonar:sonar -Dsonar.projectKey=spring-boot-mvn-courses -Dsonar.host.url=https://ibm-sonar.digite.com -Dsonar.login=7a0da1e648e56a6bfce26777c747b5cf6e0320e4"
+							}
+					}
+
+				stage('Create Artifact')
+					{
+						steps
+							{
+								echo "Create Artifact"
+								sh "mvn clean install"
+							}
+					}		
+			}
+	}
