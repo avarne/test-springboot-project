@@ -10,7 +10,7 @@ pipeline
 					{
 						steps
 							{
-								echo "execute junit"
+								echo "execute junit tests"
 								sh "mvn clean test"
 								sh "cd /var/jenkins_home/workspace/TestingPipeline/target/surefire-reports && zip -r junitresults.zip ."
 								sh "aws s3 cp junitresults.zip s3://ibmpilot/junit/junitresults.zip"
