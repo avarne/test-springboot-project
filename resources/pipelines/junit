@@ -12,8 +12,7 @@ pipeline
 							{
 								echo "execute junit tests"
 								sh "mvn clean test"
-								sh "cd target/surefire-reports && zip -r junitresults.zip ."
-								sh "aws s3 cp junitresults.zip s3://ibmpilot/junit/junitresults.zip"
+								sh "cd target/surefire-reports && zip -r junitresults.zip . && aws s3 cp junitresults.zip s3://ibmpilot/junit/junitresults.zip"
 							}
 
 					}
