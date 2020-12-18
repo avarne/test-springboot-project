@@ -32,7 +32,7 @@ pipeline
 							{
 								echo "Create Artifact"
 								sh "mvn clean install"
-								sh "cd target && aws s3 cp student-services-0.0.1-SNAPSHOT.jar s3://ibmpilot/artefact/ENTPservice.jar"
+								sh "cd target && aws s3 cp SwiftEntp-services-0.0.1-SNAPSHOT.jar s3://ibmpilot/artefact/ENTPservice.jar"
 							}
 					}		
 			}
