@@ -1,3 +1,8 @@
+env.GIT_COMMIT_MSG=""
+env.GIT_COMMIT_AUTHOR=""
+env.Git_COMMIT_DATE=""
+env.AUTH_TOKEN="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbnRJZCI6NTA1MDAsImV4cCI6MTkyNDk5MTk5OSwidXNlcklkIjoiNTA1MDAifQ.O9F1EqX6tipj8AGv5QuTAIgw0QaWwt5y33kO7bb26A0"
+
 pipeline
 	{
 		agent 
@@ -34,6 +39,44 @@ pipeline
 								sh "mvn clean install"
 								sh "cd target && aws s3 cp SwiftEntp-services-0.0.1-SNAPSHOT.jar s3://ibmpilot/artefact/ENTPservice.jar"
 							}
-					}		
+					}
+
+				stage('Add oncomit instance')
+					{
+						steps
+							{
+								script
+									{
+										echo 'Hello World'
+
+					                    echo "'$GIT_COMMIT'" 
+
+					                    echo "'$GIT_URL'"
+
+					                    def gitauthor = sh(script: 'git log -1 --pretty=format:%an', returnStdout: true)
+					                    echo "'$gitauthor'"
+
+					                    def gitmsg = sh(script: "git log --format=format:%s -1", returnStdout: true)
+					                    echo "'$gitmsg'"
+
+					                    Git_COMMIT_DATE = sh(script: "git log -1 --format=format:%cd", returnStdout: true)
+					                    echo "'$Git_COMMIT_DATE'"					                 
+
+					                    env.Git_COMMIT_AUTHOR = gitauthor
+
+					                    echo "'$Git_COMMIT_AUTHOR'"
+
+					                    env.GIT_COMMIT_MSG = gitmsg
+
+					                    echo "'$GIT_COMMIT_MSG'"
+					                    
+					                    echo "'$GIT_COMMIT' '$GIT_URL' '$Git_COMMIT_DATE' '$GIT_COMMIT_AUTHOR' '$GIT_COMMIT_MSG' '$GIT_BRANCH'"
+					                    
+					                    echo 'executing curl to create oncomit instance'
+					                    sh """curl -X POST https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$GIT_COMMIT\", \"Author\" : \"$GIT_COMMIT_AUTHOR\", \"Commit Date\" : \"$Git_COMMIT_DATE\", \"Commit Comment\" : \"$GIT_COMMIT_MSG\", \"GitURL\" : \"$GIT_URL\", \"GitBranch\" : \"$GIT_BRANCH\", \"Files Changed\" : \"test files changed\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"GCT_f\" }}' """
+
+									}
+							}
+					}
 			}
 	}
