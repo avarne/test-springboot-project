@@ -55,20 +55,18 @@ pipeline
 
 					                    def gitauthor = sh(script: 'git log -1 --pretty=format:%an', returnStdout: true)
 					                    echo "'$gitauthor'"
+					                    env.Git_COMMIT_AUTHOR = gitauthor
+					                    echo "'$Git_COMMIT_AUTHOR'"
 
 					                    def gitmsg = sh(script: "git log --format=format:%s -1", returnStdout: true)
 					                    echo "'$gitmsg'"
+					                    env.GIT_COMMIT_MSG = gitmsg
+					                    echo "'$GIT_COMMIT_MSG'"
 
 					                    Git_COMMIT_DATE = sh(script: "git log -1 --format=format:%cd", returnStdout: true)
-					                    echo "'$Git_COMMIT_DATE'"					                 
+					                    echo "'$Git_COMMIT_DATE'"
 
-					                    env.Git_COMMIT_AUTHOR = gitauthor
-
-					                    echo "'$Git_COMMIT_AUTHOR'"
-
-					                    env.GIT_COMMIT_MSG = gitmsg
-
-					                    echo "'$GIT_COMMIT_MSG'"
+					                    git diff --name-only HEAD HEAD~1
 					                    
 					                    echo "'$GIT_COMMIT' '$GIT_URL' '$Git_COMMIT_DATE' '$GIT_COMMIT_AUTHOR' '$GIT_COMMIT_MSG' '$GIT_BRANCH'"
 					                    
