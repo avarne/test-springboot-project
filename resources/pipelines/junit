@@ -87,6 +87,10 @@ pipeline
 					                    echo "${gitdifarr[0]} ${gitdifarr[1]}"
 					                    env.GIT_DIF=${gitdifarr[0]}^^${gitdifarr[1]}
 					                    echo "'$GIT_DIF'"
+
+					                    def gitdifarr = GIT_DIF.split('\n')
+					                    echo "'$gitdifarr'"
+					                    echo "${gitdifarr[0]} ${gitdifarr[1]}"
 					                    
 					                    echo "'$GIT_COMMIT' '$GIT_URL' '$Git_COMMIT_DATE' '$GIT_COMMIT_AUTHOR' '$GIT_COMMIT_MSG' '$GIT_BRANCH' '$PROJ_CODE' '$ITEM_CODE'"
 					                    
