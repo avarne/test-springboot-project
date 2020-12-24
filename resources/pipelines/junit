@@ -91,7 +91,7 @@ pipeline
 					                    echo "'$GIT_COMMIT' '$GIT_URL' '$Git_COMMIT_DATE' '$GIT_COMMIT_AUTHOR' '$GIT_COMMIT_MSG' '$GIT_BRANCH' '$PROJ_CODE' '$ITEM_CODE'"
 					                    
 					                    echo 'executing curl to create oncomit instance'
-					                    sh """curl -X POST https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$GIT_COMMIT\", \"Author\" : \"$GIT_COMMIT_AUTHOR\", \"Commit Date\" : \"$Git_COMMIT_DATE\", \"Commit Comment\" : \"$GIT_COMMIT_MSG\", \"GitURL\" : \"$GIT_URL\", \"GitBranch\" : \"$GIT_BRANCH\", \"Project Code\" : \"$PROJ_CODE\", \"Item Code\" : \"$ITEM_CODE\", \"Files Changed\" : \"$GIT_DIF\", \"ECR_Changed File List\" : \"$GIT_DIF\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"GCT_f\" }}' """
+					                    sh """curl -X POST https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$GIT_COMMIT\", \"Author\" : \"$GIT_COMMIT_AUTHOR\", \"Commit Date\" : \"$Git_COMMIT_DATE\", \"Commit Comment\" : \"$GIT_COMMIT_MSG\", \"GitURL\" : \"$GIT_URL\", \"GitBranch\" : \"$GIT_BRANCH\", \"Project Code\" : \"$PROJ_CODE\", \"Item Code\" : \"$ITEM_CODE\", \"Files Changed\" : \"$GIT_DIF\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"GCT_f\" }}' """
 
 
 					                    echo 'executing curl to create build instance'
