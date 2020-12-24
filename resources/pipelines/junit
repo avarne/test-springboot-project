@@ -1,6 +1,7 @@
 env.GIT_COMMIT_MSG=""
 env.GIT_COMMIT_AUTHOR=""
 env.Git_COMMIT_DATE=""
+env.BUILD_NUMBER=""
 env.AUTH_TOKEN="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbnRJZCI6NTA1MDAsImV4cCI6MTkyNDk5MTk5OSwidXNlcklkIjoiNTA1MDAifQ.O9F1EqX6tipj8AGv5QuTAIgw0QaWwt5y33kO7bb26A0"
 
 pipeline
@@ -52,6 +53,9 @@ pipeline
 					                    echo "'$GIT_COMMIT'" 
 
 					                    echo "'$GIT_URL'"
+					                    
+					                    def buildNumber = currentBuild.number
+					                    env.BUILD_NUMBER = buildNumber
 
 					                    def gitauthor = sh(script: 'git log -1 --pretty=format:%an', returnStdout: true)
 					                    echo "'$gitauthor'"
@@ -79,21 +83,29 @@ pipeline
 					                    echo "'$Git_COMMIT_DATE'"
 
 					                    def gitdif = sh(script: "git diff --name-only HEAD HEAD~1", returnStdout: true)
-					                    /env.GIT_DIF = gitdif
-					                    echo "'$gitdif'"
+					                    env.GIT_DIF = gitdif
+					                    echo "'$GIT_DIF'"
 
-					                    def gitdifarr = gitdif.split('\n')
+					                    def gitdifarr = GIT_DIF.split('\n')
 					                    echo "'$gitdifarr'"
-					                    echo "${gitdifarr[0]} ${gitdifarr[1]}"
+                                        def carratfile = gitdifarr.join('^^')
+                                        echo "'$carratfile'"
+                                        
+                                        def gitchangecount = sh(script: "git whatchanged -1 --format=format:oneline | wc -l", returnStdout: true).trim()
+                                        echo "'$gitchangecount'"
+                                        
+                                        def gitrepo = sh(script: "basename -s .git `git config --get remote.origin.url`", returnStdout: true).trim()
+                                        echo "'$gitrepo'"
+                                        env.GIT_REPO_NAME = gitrepo
 					                    
-					                    echo "'$GIT_COMMIT' '$GIT_URL' '$Git_COMMIT_DATE' '$GIT_COMMIT_AUTHOR' '$GIT_COMMIT_MSG' '$GIT_BRANCH' '$PROJ_CODE' '$ITEM_CODE'"
+					                    echo "'$GIT_COMMIT' '$GIT_URL' '$Git_COMMIT_DATE' '$GIT_COMMIT_AUTHOR' '$GIT_COMMIT_MSG' '$GIT_BRANCH'"
 					                    
 					                    echo 'executing curl to create oncomit instance'
-					                    sh """curl -X POST https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$GIT_COMMIT\", \"Author\" : \"$GIT_COMMIT_AUTHOR\", \"Commit Date\" : \"$Git_COMMIT_DATE\", \"Commit Comment\" : \"$GIT_COMMIT_MSG\", \"GitURL\" : \"$GIT_URL\", \"GitBranch\" : \"$GIT_BRANCH\", \"Project Code\" : \"$PROJ_CODE\", \"Item Code\" : \"$ITEM_CODE\", \"Files Changed\" : \"files changed\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"GCT_f\" }}' """
+					                    sh """curl -X POST https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$GIT_COMMIT\", \"Author\" : \"$GIT_COMMIT_AUTHOR\", \"Commit Date\" : \"$Git_COMMIT_DATE\", \"Commit Comment\" : \"$GIT_COMMIT_MSG\", \"GitURL\" : \"$GIT_URL\", \"GitBranch\" : \"$GIT_BRANCH\", \"Project Code\" : \"$PROJ_CODE\", \"Item Code\" : \"$ITEM_CODE\", \"Files Changed\" : \"$carratfile\", \"ECR_Changed File List\" : \"$carratfile\", \"CountOfFiles\" : \"$gitchangecount\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"GCT_f\" }}' """
 
 
 					                    echo 'executing curl to create build instance'
-					                    sh """curl -X POST "https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData" -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$GIT_COMMIT\", }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\" }}'"""
+					                    sh """curl -X POST "https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData" -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$BUILD_NUMBER:$GIT_REPO_NAME\", }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\" }}'"""
 
 									}
 							}
