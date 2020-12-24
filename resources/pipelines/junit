@@ -58,7 +58,7 @@ pipeline
 					                    env.Git_COMMIT_AUTHOR = gitauthor
 					                    echo "'$Git_COMMIT_AUTHOR'"
 
-					                    def gitmsg = sh(script: "git log --format=format:%s -1", returnStdout: true)
+					                    def gitmsg = sh(script: "git log --format=format:%b -1", returnStdout: true)
 					                    echo "'$gitmsg'"
 					                    env.GIT_COMMIT_MSG = gitmsg
 					                    echo "'$GIT_COMMIT_MSG'"
