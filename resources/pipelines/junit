@@ -67,12 +67,17 @@ pipeline
 					                    echo "'$Git_COMMIT_DATE'"
 
 					                    def gitdif = sh(script: "git diff --name-only HEAD HEAD~1", returnStdout: true)
-					                    echo $gitdif
+					                    env.GIT_DIF = gitdif
+					                    echo "'$GIT_DIF'"
 					                    
 					                    echo "'$GIT_COMMIT' '$GIT_URL' '$Git_COMMIT_DATE' '$GIT_COMMIT_AUTHOR' '$GIT_COMMIT_MSG' '$GIT_BRANCH'"
 					                    
 					                    echo 'executing curl to create oncomit instance'
-					                    sh """curl -X POST https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$GIT_COMMIT\", \"Author\" : \"$GIT_COMMIT_AUTHOR\", \"Commit Date\" : \"$Git_COMMIT_DATE\", \"Commit Comment\" : \"$GIT_COMMIT_MSG\", \"GitURL\" : \"$GIT_URL\", \"GitBranch\" : \"$GIT_BRANCH\", \"Files Changed\" : \"test files changed\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"GCT_f\" }}' """
+					                    sh """curl -X POST https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$GIT_COMMIT\", \"Author\" : \"$GIT_COMMIT_AUTHOR\", \"Commit Date\" : \"$Git_COMMIT_DATE\", \"Commit Comment\" : \"$GIT_COMMIT_MSG\", \"GitURL\" : \"$GIT_URL\", \"GitBranch\" : \"$GIT_BRANCH\", \"Files Changed\" : \"$GIT_DIF\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"GCT_f\" }}' """
+
+
+					                    echo 'executing curl to create build instance'
+					                    sh """curl -X POST "https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData" -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$GIT_COMMIT\", }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\" }}'"""
 
 									}
 							}
