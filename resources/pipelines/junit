@@ -121,7 +121,7 @@ pipeline
 						echo "failedstage is $FAILED_STAGE"
 
 						echo "execute junit tests"
-						sh "mvn clean test || :"
+						sh "mvn clean test"
 						sh "cd target/surefire-reports && zip -r junitresults.zip . && aws s3 cp junitresults.zip s3://ibmpilot/junit/junitresults.zip"
 							
 						echo "update build eform instance with compile and Junit as pass"
