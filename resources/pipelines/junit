@@ -130,7 +130,7 @@ pipeline
 						//echo "Call Junit Parser and updated the results in Unit test Summary and create defect instance if any junit failures"                        
 	                    //sh "pip3 install -r requirements.txt"
 						//sh "python3 junit_parser.py -u 'admin_IBM' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc 'IBMC000001INTG'"
-					}cache(err){
+					}catch(Exception e){
 						echo "$STAGE_NAME"
 						def failedstage=env.STAGE_NAME
 						env.FAILED_STAGE=failedstage
