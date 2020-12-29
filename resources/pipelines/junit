@@ -136,14 +136,7 @@ pipeline
 						sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Compile\" : \"Pass\", \"JunitJaCoCo\": \"Pass\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 
 					}catch(Exception e){
-						echo "$STAGE_NAME"
-						def failedstage=env.STAGE_NAME
-						env.FAILED_STAGE=failedstage
-						echo "failedstage is $FAILED_STAGE"
-
-						echo "update build eform instance with Compile, Junit and Build Status as Failed"
-						sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Compile\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
-
+						
 						sh "exit 1"
 
 					}finally{
