@@ -113,21 +113,38 @@ pipeline
 			{
 				script
 				{
-					echo "$STAGE_NAME"
-					def failedstage=env.STAGE_NAME
-					env.FAILED_STAGE=failedstage
-					echo "failedstage is $FAILED_STAGE"
+					try
+					{
+						echo "$STAGE_NAME"
+						def failedstage=env.STAGE_NAME
+						env.FAILED_STAGE=failedstage
+						echo "failedstage is $FAILED_STAGE"
 
-					echo "execute junit tests"
-					sh "mvn clean test || :"
-					sh "cd target/surefire-reports && zip -r junitresults.zip . && aws s3 cp junitresults.zip s3://ibmpilot/junit/junitresults.zip"
-						
-					echo "update build eform instance with compile and Junit as pass"
-					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Compile\" : \"Pass\", \"JunitJaCoCo\": \"Pass\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+						echo "execute junit tests"
+						sh "mvn clean test || :"
+						sh "cd target/surefire-reports && zip -r junitresults.zip . && aws s3 cp junitresults.zip s3://ibmpilot/junit/junitresults.zip"
+							
+						echo "update build eform instance with compile and Junit as pass"
+						sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Compile\" : \"Pass\", \"JunitJaCoCo\": \"Pass\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 
+						//echo "Call Junit Parser and updated the results in Unit test Summary and create defect instance if any junit failures"                        
+	                    //sh "pip3 install -r requirements.txt"
+						//sh "python3 junit_parser.py -u 'admin_IBM' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc 'IBMC000001INTG'"
+					}cache(err){
+						echo "$STAGE_NAME"
+						def failedstage=env.STAGE_NAME
+						env.FAILED_STAGE=failedstage
+						echo "failedstage is $FAILED_STAGE"
+
+						echo "update build eform instance with Compile, Junit and Build Status as Failed"
+						sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Compile\" : \"Failed\", \"Build Status\" : \"Failed\", \"JunitJaCoCo\" : \"Failed\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+
+						sh "exit 1"
+					}finally{
 					echo "Call Junit Parser and updated the results in Unit test Summary and create defect instance if any junit failures"                        
-                    sh "pip3 install -r requirements.txt"
-					sh "python3 junit_parser.py -u 'admin_IBM' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc 'IBMC000001INTG'"					
+	                    sh "pip3 install -r requirements.txt"
+						sh "python3 junit_parser.py -u 'admin_IBM' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc 'IBMC000001INTG'"
+					}
 				}	
 			}
 		}
@@ -168,7 +185,7 @@ pipeline
 					echo "failedstage is $FAILED_STAGE"
 
 					echo "Create Artefact"
-					sh "mvn clean install"
+					sh "mvn clean install || :"
 					sh "cd target && aws s3 cp SwiftEntp-services-0.0.1-SNAPSHOT.jar s3://ibmpilot/artefact/ENTPservice.jar"
 
 					echo "update build eform instance with artefact values"
