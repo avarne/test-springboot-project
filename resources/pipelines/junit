@@ -3,7 +3,7 @@ env.GIT_COMMIT_AUTHOR=""
 env.Git_COMMIT_DATE=""
 env.BUILD_NUMBER=""
 env.GIT_REPO_NAME=""
-env.BUILD_EFORMID="bld_34"
+env.BUILD_EFORMID="bld_35"
 env.AUTH_TOKEN="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbnRJZCI6NTA1MDAsImV4cCI6MTkyNDk5MTk5OSwidXNlcklkIjoiNTA1MDAifQ.O9F1EqX6tipj8AGv5QuTAIgw0QaWwt5y33kO7bb26A0"
 
 pipeline
@@ -107,6 +107,10 @@ pipeline
 			{
 				script
 				{
+					echo "$STAGE_NAME"
+					def FAILED_STAGE=env.STAGE_NAME
+					echo "failedstage is $FAILED_STAGE"
+
 					echo "execute junit tests"
 					sh "mvn clean test"
 					sh "cd target/surefire-reports && zip -r junitresults.zip . && aws s3 cp junitresults.zip s3://ibmpilot/junit/junitresults.zip"
@@ -116,11 +120,7 @@ pipeline
 
 					echo "Call Junit Parser and updated the results in Unit test Summary and create defect instance if any junit failures"                        
                     sh "pip install -r requirements.txt"
-					sh "python junit_parser.py -u '$AUTH_TOKEN' -bi $BUILD_EFORMID"
-
-					echo "$STAGE_NAME"
-					def FAILED_STAGE=env.STAGE_NAME
-					echo "failedstage is $FAILED_STAGE"
+					sh "python junit_parser.py -u '$AUTH_TOKEN' -bi $BUILD_EFORMID"					
 				}	
 			}
 		}
@@ -131,6 +131,10 @@ pipeline
 			{
 				script
 				{
+					echo "$STAGE_NAME"
+					def FAILED_STAGE=env.STAGE_NAME
+					echo "failedstage is $FAILED_STAGE"
+
 					echo "execute Sonar"
 					sh "mvn sonar:sonar -Dsonar.projectKey=spring-boot-mvn-courses -Dsonar.host.url=https://ibm-sonar.digite.com -Dsonar.login=7a0da1e648e56a6bfce26777c747b5cf6e0320e4"
 
@@ -139,11 +143,7 @@ pipeline
 
 					echo "Call Sonar Parser and updated the results in Unit test Summary"
                     sh "pip install -r requirements.txt"
-					sh "python sonar_parser.py -t '$AUTH_TOKEN' -b $BUILD_EFORMID"
-
-					echo "$STAGE_NAME"
-					def FAILED_STAGE=env.STAGE_NAME
-					echo "failedstage is $FAILED_STAGE"					
+					sh "python sonar_parser.py -t '$AUTH_TOKEN' -b $BUILD_EFORMID"										
 				}
 			}	
 		}
@@ -154,16 +154,16 @@ pipeline
 			{
 				script
 				{
+					echo "$STAGE_NAME"
+					def FAILED_STAGE=env.STAGE_NAME
+					echo "failedstage is $FAILED_STAGE"
+
 					echo "Create Artefact"
 					sh "mvn clean install"
 					sh "cd target && aws s3 cp SwiftEntp-services-0.0.1-SNAPSHOT.jar s3://ibmpilot/artefact/ENTPservice.jar"
 
 					echo "update build eform instance with artefact values"
-					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Upload Artifact\" : \"Pass\", \"Artifact location\": \"s3://ibmpilot/artefact/ENTPservice.jar\"}], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
-
-					echo "$STAGE_NAME"
-					def FAILED_STAGE=env.STAGE_NAME
-					echo "failedstage is $FAILED_STAGE"
+					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Upload Artifact\" : \"Pass\", \"Artifact location\": \"s3://ibmpilot/artefact/ENTPservice.jar\"}], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""					
 				}	
 			}
 		}
