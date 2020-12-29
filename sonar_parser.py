@@ -55,8 +55,8 @@ def parse_sonar_report(component):
 
     #print(f"status code {res.status_code}")
     #print(f"status text {res.text}")
-    print("status code " + res.status_code)
-    print("status text " + res.text)
+    print("status code " + str(res.status_code))
+    print("status text " + str(res.text))
 
     jsondata = json.loads(res.text)
     features = jsondata.get("component").get("measures")
@@ -91,7 +91,7 @@ def call_se_rest_apt(field_json, authToken):
              "ItemCode": build_eform_itemcode}
     headers = {"AuthorizationToken": str(authToken), "Content-Type": "application/json"}
     resp = requests.put(url=url, data=json.dumps(input), headers=headers)
-    print(resp.text, resp.status_code)
+    print(resp.text, str(resp.status_code))
 
 
 field_json = parse_sonar_report(proj_name)
