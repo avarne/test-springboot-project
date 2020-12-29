@@ -3,7 +3,7 @@ env.GIT_COMMIT_AUTHOR=""
 env.Git_COMMIT_DATE=""
 env.BUILD_NUMBER=""
 env.GIT_REPO_NAME=""
-env.BUILD_EFORMID="bld3"
+env.BUILD_EFORMID=""
 env.AUTH_TOKEN="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbnRJZCI6NTA1MDAsImV4cCI6MTkyNDk5MTk5OSwidXNlcklkIjoiNTA1MDAifQ.O9F1EqX6tipj8AGv5QuTAIgw0QaWwt5y33kO7bb26A0"
 
 pipeline
@@ -45,7 +45,14 @@ pipeline
 		            echo "'itemcode is $ITEM_CODE'"
 
 					echo 'executing curl to create buildeform instance'
-			        sh """curl -X POST "https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData" -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$BUILD_NUMBER:$GIT_REPO_NAME\", \"Jenkins Job ID\" : \"$BUILD_NUMBER\", \"JIRA Project Key\" : \"$PROJ_CODE\", \"JIRA Item Code\" : \"$ITEM_CODE\", }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\" }}'"""
+			        //sh """curl -X POST "https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData" -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$BUILD_NUMBER:$GIT_REPO_NAME\", \"Jenkins Job ID\" : \"$BUILD_NUMBER\", \"JIRA Project Key\" : \"$PROJ_CODE\", \"JIRA Item Code\" : \"$ITEM_CODE\", }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\" }}'"""
+                            def response = sh(script: """curl -X POST "https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData" -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$BUILD_NUMBER:$GIT_REPO_NAME\", \"Jenkins Job ID\" : \"$BUILD_NUMBER\", \"JIRA Project Key\" : \"$PROJ_CODE\", \"JIRA Item Code\" : \"$ITEM_CODE\", }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\" }}'""", returnStdout: true)
+                            def responseObject = readJSON text: response
+                            def ID = "$responseObject.data.ItemCode"
+                            println("ID:  $ID")
+                            env.BUILD_EFORMID = ID
+                            println(env.BUILD_EFORMID)
+                           
 			    }    
 			}
 		}
