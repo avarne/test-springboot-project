@@ -29,8 +29,10 @@ build_eform_itemcode = str(ARGS.BUILD_EFORM_ITEMCODE)
 
 
 def generate_se_login_token():
-    url = f"{se_url}/rest/api/TokenService/getToken"
-    data = f"Loginid={se_username}&Password={se_pass}"
+    # url = f"{se_url}/rest/api/TokenService/getToken"
+    url = se_url + "/rest/api/TokenService/getToken"
+    # data = f"Loginid={se_username}&Password={se_pass}"
+    data = "Loginid=" + se_username + "&Password=" + se_pass
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
     resp = requests.post(url=url, data=data, headers=headers)
     token = 0
@@ -46,13 +48,15 @@ def parse_sonar_report(component):
                   "component": component,
                   "metricKeys": "ncloc,complexity,violations,bugs,vulnerabilities,code_smells,violations"
                   }
-    print(f"url is {sonar_server_url}/api/measures/component")
+    print("url is " + sonar_server_url + "/api/measures/component")
 
     # res = requests.get(f"{solarqube_host}/api/measures/component", params=genrequest, auth=auth)
-    res = requests.get(f"{sonar_server_url}api/measures/component", params=genrequest)
+    res = requests.get(sonar_server_url + "api/measures/component", params=genrequest)
 
-    print(f"status code {res.status_code}")
-    print(f"status text {res.text}")
+    #print(f"status code {res.status_code}")
+    #print(f"status text {res.text}")
+    print("status code " + res.status_code)
+    print("status text " + res.text)
 
     jsondata = json.loads(res.text)
     features = jsondata.get("component").get("measures")
@@ -72,7 +76,7 @@ def parse_sonar_report(component):
 
 
 def call_se_rest_apt(field_json, authToken):
-    url = f"{se_url}/rest/api/EFormService/modifyEFormItemData"
+    url = se_url + "/rest/api/EFormService/modifyEFormItemData"
     se_field_json = field_json
     se_field_json["Code Smells"] = se_field_json.pop("code_smells", "code_smells")
     se_field_json["Lines Of Code"] = se_field_json.pop("ncloc", "ncloc")
