@@ -3,7 +3,7 @@ env.GIT_COMMIT_AUTHOR=""
 env.Git_COMMIT_DATE=""
 env.BUILD_NUMBER=""
 env.GIT_REPO_NAME=""
-env.BUILD_EFORMID="bld_35"
+env.BUILD_EFORMID="bld37"
 env.AUTH_TOKEN="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbnRJZCI6NTA1MDAsImV4cCI6MTkyNDk5MTk5OSwidXNlcklkIjoiNTA1MDAifQ.O9F1EqX6tipj8AGv5QuTAIgw0QaWwt5y33kO7bb26A0"
 
 pipeline
@@ -108,7 +108,8 @@ pipeline
 				script
 				{
 					echo "$STAGE_NAME"
-					def FAILED_STAGE=env.STAGE_NAME
+					def failedstage=env.STAGE_NAME
+					env.FAILED_STAGE=failedstage
 					echo "failedstage is $FAILED_STAGE"
 
 					echo "execute junit tests"
@@ -119,8 +120,8 @@ pipeline
 					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Compile\" : \"Pass\", \"JunitJaCoCo\": \"Pass\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 
 					echo "Call Junit Parser and updated the results in Unit test Summary and create defect instance if any junit failures"                        
-                    sh "pip install -r requirements.txt"
-					sh "python junit_parser.py -u '$AUTH_TOKEN' -bi $BUILD_EFORMID"					
+                    sh "pip3 install -r requirements.txt"
+					sh "python3 junit_parser.py -u '$AUTH_TOKEN' -bi $BUILD_EFORMID"					
 				}	
 			}
 		}
@@ -132,7 +133,8 @@ pipeline
 				script
 				{
 					echo "$STAGE_NAME"
-					def FAILED_STAGE=env.STAGE_NAME
+					def failedstage=env.STAGE_NAME
+					env.FAILED_STAGE=failedstage
 					echo "failedstage is $FAILED_STAGE"
 
 					echo "execute Sonar"
@@ -142,8 +144,8 @@ pipeline
 					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Code Quality\" : \"Pass\"}], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 
 					echo "Call Sonar Parser and updated the results in Unit test Summary"
-                    sh "pip install -r requirements.txt"
-					sh "python sonar_parser.py -t '$AUTH_TOKEN' -b $BUILD_EFORMID"										
+                    sh "pip3 install -r requirements.txt"
+					sh "python3 sonar_parser.py -t '$AUTH_TOKEN' -b $BUILD_EFORMID"										
 				}
 			}	
 		}
@@ -155,7 +157,8 @@ pipeline
 				script
 				{
 					echo "$STAGE_NAME"
-					def FAILED_STAGE=env.STAGE_NAME
+					def failedstage=env.STAGE_NAME
+					env.FAILED_STAGE=failedstage
 					echo "failedstage is $FAILED_STAGE"
 
 					echo "Create Artefact"
@@ -190,19 +193,19 @@ pipeline
 		{
 			script
 			{
-				if($FAILED_STAGE == "Compile"){
+				if("$FAILED_STAGE" == "Compile"){
 					echo "update build eform instance with Compile and Build status as Failed"
 					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Compile\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 				}	
-				else if($FAILED_STAGE == "RunMavenJunit"){
+				else if("$FAILED_STAGE" == "RunMavenJunit"){
 					echo "update build eform instance with Compile, Junit and Build Status as Failed"
 					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Compile\" : \"Failed\", \"Build Status\" : \"Failed\", \"JunitJaCoCo\" : \"Failed\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 				}
-				else if($FAILED_STAGE == "RunSonar"){
+				else if("$FAILED_STAGE" == "RunSonar"){
 					echo "update build eform instance with Code Quality and Build Status as Failed"
 					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Code Quality\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 				}
-				else if($FAILED_STAGE == "CreateArtefact"){
+				else if("$FAILED_STAGE" == "CreateArtefact"){
 					echo "update build eform instance with CreateArtefact and Build Status as Failed"
 					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Upload Artifact\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 				}
