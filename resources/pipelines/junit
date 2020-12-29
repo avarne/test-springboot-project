@@ -102,7 +102,16 @@ pipeline
 			{
 				script
 				{
+					echo "$STAGE_NAME"
+					def failedstage=env.STAGE_NAME
+					env.FAILED_STAGE=failedstage
+					echo "failedstage is $FAILED_STAGE"
+
 					echo "Compile code"				
+					sh "mvn compile"
+
+					echo "update build eform instance with Compile field as Pass"
+					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Compile\" : \"Pass\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000001INTG\", \"ItemType\":\"bld_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 				}	
 			}
 		}	
