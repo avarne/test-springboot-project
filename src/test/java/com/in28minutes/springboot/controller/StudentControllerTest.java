@@ -65,7 +65,7 @@ public class StudentControllerTest {
 	@Test
 	public void createStudentCourse() throws Exception {
 		Course mockCourse = new Course("1", "Smallest Number", "1",
-				Arrays.asList());
+				Arrays.asList("1", "2", "3", "4"));
 
 		// studentService.addCourse to respond back with mockCourse
 		Mockito.when(
@@ -84,7 +84,7 @@ public class StudentControllerTest {
 
 		assertEquals(HttpStatus.CREATED.value(), response.getStatus());
 
-		assertEquals("http://localhost/students/Student1/courses/1",
+		assertEquals("http://localhost/students/Student1/courses/",
 				response.getHeader(HttpHeaders.LOCATION));
 
 	}
