@@ -6,7 +6,7 @@
 	<groupId>com.in28minutes.springboot</groupId>
 	<artifactId>SwiftEntp-services</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 
 	<name>SwiftEntp-services</name>
 	<description>Demo project for Spring Boot</description>
