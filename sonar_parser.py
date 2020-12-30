@@ -1,12 +1,10 @@
 import json
-#import os
 import requests
 import argparse
 #from requests.auth import HTTPBasicAuth
 
 
 PARSER = argparse.ArgumentParser()
-# PARSER.add_argument("-j", "--CI_JOB_ID", default='1')
 PARSER.add_argument("-c", "--PROJ_NAME", default='spring-boot-mvn-courses')
 PARSER.add_argument("-l", "--SE_URL", default='https://ibm.digite.com')
 PARSER.add_argument("-u", "--SE_USERNAME", default='7')
@@ -15,6 +13,8 @@ PARSER.add_argument("-du", "--SE_DEVOPS_USER", default='admin_IBM')
 PARSER.add_argument("-t", "--SE_API_TOKEN", default='gfgdfgdtrtrdtd')
 PARSER.add_argument("-s", "--SONAR_SERVER_URL", default='https://ibm-sonar.digite.com/')
 PARSER.add_argument("-b", "--BUILD_EFORM_ITEMCODE", default='bld18')
+PARSER.add_argument("-o", "--SE_OWNERCODE", default='IBMC000001INTG')
+
 
 # PARSER.add_argument("-t", "--SONAR_TOKEN", default='2')
 ARGS = PARSER.parse_args()
@@ -26,6 +26,7 @@ se_devops_user = str(ARGS.SE_DEVOPS_USER)
 se_api_token = str(ARGS.SE_API_TOKEN)
 sonar_server_url = str(ARGS.SONAR_SERVER_URL)
 build_eform_itemcode = str(ARGS.BUILD_EFORM_ITEMCODE)
+se_ownercode = str(ARGS.SE_OWNERCODE)
 
 
 def generate_se_login_token():
@@ -87,7 +88,7 @@ def call_se_rest_apt(field_json, authToken):
              "FieldValues": ",".join(se_field_json.values()),
              "CreatorLoginId": se_devops_user,
              "OwnerType": "Prj",
-             "OwnerCode": "IBMC000001INTG",
+             "OwnerCode": se_ownercode,
              "ItemType": "GCT_f",
              "ItemCode": build_eform_itemcode}
     headers = {"AuthorizationToken": str(authToken), "Content-Type": "application/json"}
@@ -100,4 +101,3 @@ auth_token = se_api_token
 if auth_token is None:
     auth_token = generate_se_login_token()
 call_se_rest_apt(field_json, auth_token)
-
