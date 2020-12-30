@@ -13,7 +13,7 @@ PARSER.add_argument("-du", "--SE_DEVOPS_USER", default='admin_IBM')
 PARSER.add_argument("-t", "--SE_API_TOKEN", default='gfgdfgdtrtrdtd')
 PARSER.add_argument("-s", "--SONAR_SERVER_URL", default='https://ibm-sonar.digite.com/')
 PARSER.add_argument("-b", "--BUILD_EFORM_ITEMCODE", default='bld18')
-PARSER.add_argument("-o", "--SE_OWNERCODE", default='IBMC000001INTG')
+PARSER.add_argument("-oc", "--SE_OWNERCODE", default='IBMC000001INTG')
 
 
 # PARSER.add_argument("-t", "--SONAR_TOKEN", default='2')
@@ -89,7 +89,7 @@ def call_se_rest_apt(field_json, authToken):
              "CreatorLoginId": se_devops_user,
              "OwnerType": "Prj",
              "OwnerCode": se_ownercode,
-             "ItemType": "GCT_f",
+             "ItemType": "BULD_f",
              "ItemCode": build_eform_itemcode}
     headers = {"AuthorizationToken": str(authToken), "Content-Type": "application/json"}
     resp = requests.put(url=url, data=json.dumps(input), headers=headers)
