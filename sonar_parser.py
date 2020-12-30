@@ -46,7 +46,7 @@ def parse_sonar_report(component):
 
     genrequest = {
                   "component": component,
-                  "metricKeys": "ncloc,complexity,violations,bugs,vulnerabilities,code_smells,violations"
+                  "metricKeys": "ncloc,complexity,violations,bugs,vulnerabilities,code_smells,violations,coverage"
                   }
     print("url is " + sonar_server_url + "/api/measures/component")
 
@@ -80,6 +80,7 @@ def call_se_rest_apt(field_json, authToken):
     se_field_json = field_json
     se_field_json["Code Smells"] = se_field_json.pop("code_smells", "code_smells")
     se_field_json["Lines Of Code"] = se_field_json.pop("ncloc", "ncloc")
+    se_field_json["Code Coverage Percentage"] = se_field_json.pop("coverage", "coverage")
 
     print(se_field_json)
     input = {"FieldLabels": ",".join(se_field_json.keys()),
