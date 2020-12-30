@@ -51,7 +51,7 @@ pipeline
 		            echo "'itemcode is $ITEM_CODE'"
 
 					echo 'executing curl to create buildeform instance'
-			        def response = sh(script: """curl -X POST "https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData" -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$BUILD_NUMBER:$GIT_REPO_NAME\", \"Pipeline URL\" : \"https://ibm-jenkins.digite.com/job/TestingPipeline/job/spring-boot-mvn-courses/$BUILD_NUMBER\", \"Job ID\" : \"$BUILD_NUMBER\", \"JIRA Project ID\" : \"$PROJ_CODE\", \"JIRA Issue ID\" : \"$ITEM_CODE\",  \"Pre Requisite\" : \"Skipped\", \"Compile\" : \"Skipped\", \"JUnit\" : \"Skipped\", \"Code Quality\" : \"Skipped\", \"Upload Artifact\" : \"Skipped\", \"Deploy Artifact\" : \"Skipped\", \"Karate\" : \"Skipped\", }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"BULD_f\" }}'""", returnStdout: true)
+			        def response = sh(script: """curl -X POST "https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData" -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$BUILD_NUMBER:$GIT_REPO_NAME\", \"Pipeline URL\" : \"https://ibm-jenkins.digite.com/job/TestingPipeline/job/spring-boot-mvn-courses/$BUILD_NUMBER\", \"Job ID\" : \"$BUILD_NUMBER\", \"JIRA Project ID\" : \"$PROJ_CODE\", \"JIRA Issue ID\" : \"$ITEM_CODE\",  \"Pre Requisite\" : \"Skipped\", \"Compile\" : \"Skipped\", \"JUnit\" : \"Skipped\", \"Code Quality\" : \"Skipped\", \"Upload Artifact\" : \"Skipped\", \"Deploy Artifact\" : \"Skipped\", \"Karate\" : \"Skipped\", \"Build Status\" : \"In Progress\", }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"BULD_f\" }}'""", returnStdout: true)
                      
                     def responseObject = readJSON text: response
                     def ID = "$responseObject.data.ItemCode"
@@ -248,8 +248,8 @@ pipeline
 			script
 			{
 				if("$FAILED_STAGE" == "PreRequisite"){
-					echo "update build eform instance with Pre Requisite field as Failed"
-					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Pre Requisite\" : \"Failed\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""	
+					echo "update build eform instance with Pre Requisite and Build status fields as Failed"
+					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Pre Requisite\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""	
 				}
 				else if("$FAILED_STAGE" == "Compile"){
 					echo "update build eform instance with Compile and Build status as Failed"
