@@ -112,8 +112,8 @@ def push_test_results(total_tests, passed_tests, failed_tests):
         JunitJaCoCo="Pass"
     Data={"Type Of Unit Test":"JUnit",
           "Total Unit Script Count":total_tests,
-          "Pass Unit Script Count":passed_tests,
-          "Failed Unit Script Count":failed_tests,
+          "Pass Unit Scripts Count":passed_tests,
+          "Failed Unit Scripts Count":failed_tests,
           "Build Status":BuildStatus,
           "JUnit":JunitJaCoCo}
     print(Data)
