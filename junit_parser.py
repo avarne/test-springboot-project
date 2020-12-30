@@ -43,11 +43,9 @@ def xmlparser():
     failure_info = {
         "Name": build_code + ":JunitFailure",
         "Priority": "High",
-        "Complexity": "Medium",
         "Date Identified": time,
-        "Due Date": time,
         "Description": testcases,
-        "Workstream": "EM"
+        "Bug Origin": "SE"
     }
     return failure_info
 
@@ -95,7 +93,7 @@ def create_work_task(swift_deployment, username, auth_token, owner_code, issue_m
             "CreatorLoginId": username,
             "OwnerType": "Prj",
             "OwnerCode": owner_code,
-            "ItemType": "Dft"
+            "ItemType": "ABUG"
         }
     }
     response = requests.post(url, json=create_eform_request_body, headers=header)
@@ -117,14 +115,14 @@ def push_test_results(total_tests, passed_tests, failed_tests):
           "Pass Unit Script Count":passed_tests,
           "Failed Unit Script Count":failed_tests,
           "Build Status":BuildStatus,
-          "JunitJaCoCo":JunitJaCoCo}
+          "JUnit":JunitJaCoCo}
     print(Data)
     modify_eform_req_body = {
         "data":{
         "FieldsData":[Data],
         "OwnerType":"Prj",
         "OwnerCode":owner_code,
-        "ItemType":"bld_f",
+        "ItemType":"BULD_f",
         "ItemCode":build_code,
         "CreatorLoginId": username
     }

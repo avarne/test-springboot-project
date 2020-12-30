@@ -1,0 +1,273 @@
+env.GIT_COMMIT_MSG=""
+env.GIT_COMMIT_AUTHOR=""
+env.Git_COMMIT_DATE=""
+env.BUILD_NUMBER=""
+env.GIT_REPO_NAME=""
+env.BUILD_EFORMID=""
+env.AUTH_TOKEN="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbnRJZCI6NTA1MDAsImV4cCI6MTkyNDk5MTk5OSwidXNlcklkIjoiNTA1MDAifQ.O9F1EqX6tipj8AGv5QuTAIgw0QaWwt5y33kO7bb26A0"
+
+pipeline
+{
+	agent 
+	{
+		label 'master'
+	}
+	stages
+	{
+		stage('CreateBuildEform')
+		{
+			steps
+			{
+				script
+				{
+					def buildNumber = currentBuild.number
+				    env.BUILD_NUMBER = buildNumber
+		
+		            def gitrepo = sh(script: "basename -s .git `git config --get remote.origin.url`", returnStdout: true).trim()
+	                echo "'$gitrepo'"
+	                env.GIT_REPO_NAME = gitrepo
+
+	                def gitmsg = sh(script: "git log --format=format:%b -1", returnStdout: true)
+		            echo "'$gitmsg'"
+		            env.GIT_COMMIT_MSG = gitmsg
+		            echo "'$GIT_COMMIT_MSG'"
+
+		            def itemarr = GIT_COMMIT_MSG.split(':')
+		            echo "'$itemarr'"
+		            echo "${itemarr[0]} ${itemarr[1]} ${itemarr[2]}"
+
+		            echo "${itemarr[0]}"
+		            env.PROJ_CODE=itemarr[0]
+		            echo "'prjcode is $PROJ_CODE'"
+
+		            echo "${itemarr[1]}"
+		            env.ITEM_CODE=itemarr[1]
+		            echo "'itemcode is $ITEM_CODE'"
+
+					echo 'executing curl to create buildeform instance'
+			        def response = sh(script: """curl -X POST "https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData" -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$BUILD_NUMBER:$GIT_REPO_NAME\", \"Pipeline URL\" : \"https://ibm-jenkins.digite.com/job/TestingPipeline/job/spring-boot-mvn-courses/$BUILD_NUMBER\", \"Job ID\" : \"$BUILD_NUMBER\", \"JIRA Project ID\" : \"$PROJ_CODE\", \"JIRA Issue ID\" : \"$ITEM_CODE\", \"Compile\" : \"Skipped\", \"JUnit\" : \"Skipped\", \"Code Quality\" : \"Skipped\", \"Upload Artifact\" : \"Skipped\", \"Deploy Artifact\" : \"Skipped\", \"Karate\" : \"Skipped\", }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000029CAS001\", \"ItemType\":\"BULD_f\" }}'""", returnStdout: true)
+                     
+                     def responseObject = readJSON text: response
+                     def ID = "$responseObject.data.ItemCode"
+                     println("ID:  $ID")
+                     env.BUILD_EFORMID = ID
+                     println(env.BUILD_EFORMID)                           
+			    }    
+			}
+		}
+
+		stage('AddGitCommitInstance')
+		{
+			steps
+			{
+				script
+				{
+					echo 'Hello World'
+
+	                echo "'$GIT_COMMIT'" 
+
+	                echo "'$GIT_URL'"
+
+	                def gitauthor = sh(script: 'git log -1 --pretty=format:%an', returnStdout: true)
+	                echo "'$gitauthor'"
+	                env.Git_COMMIT_AUTHOR = gitauthor
+	                echo "'$Git_COMMIT_AUTHOR'"
+
+	                Git_COMMIT_DATE = sh(script: "git log -1 --format=format:%cd", returnStdout: true)
+					echo "'$Git_COMMIT_DATE'"
+
+					def gitdif = sh(script: "git diff --name-only HEAD HEAD~1", returnStdout: true)
+					env.GIT_DIF = gitdif
+					echo "'$GIT_DIF'"
+
+					def gitdifarr = GIT_DIF.split('\n')
+					echo "'$gitdifarr'"
+	                def carratfile = gitdifarr.join('^^')
+	                echo "'$carratfile'"
+	                                        
+	                //def gitchangecount = sh(script: "git whatchanged -1 --format=format:oneline | wc -l", returnStdout: true).trim()
+	                //echo "'$gitchangecount'"                                        
+	                                        
+					echo "'$GIT_COMMIT' '$GIT_URL' '$Git_COMMIT_DATE' '$GIT_COMMIT_AUTHOR' '$GIT_COMMIT_MSG' '$GIT_BRANCH'"
+						                    
+					echo 'executing curl to create oncomit instance'
+					sh """curl -X POST https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$GIT_COMMIT\", \"Author\" : \"$GIT_COMMIT_AUTHOR\", \"Commit Date\" : \"$Git_COMMIT_DATE\", \"Commit Comment\" : \"$GIT_COMMIT_MSG\", \"Files Changed\" : \"$carratfile\", \"Git URL\" : \"$GIT_URL\", \"Git Branch\" : \"$GIT_BRANCH\", \"JIRA Project ID\" : \"$PROJ_CODE\", \"JIRA Issue ID\" : \"$ITEM_CODE\", \"ECR_Changed File List\" : \"$carratfile\", \"Build ID\" : \"$BUILD_EFORMID\", }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000029CAS001\", \"ItemType\":\"GITC_f\" }}' """			                    
+				}
+			}
+		}
+
+		stage('Compile')
+		{
+			steps
+			{
+				script
+				{
+					echo "$STAGE_NAME"
+					def failedstage=env.STAGE_NAME
+					env.FAILED_STAGE=failedstage
+					echo "StageName is $FAILED_STAGE"
+
+					echo "Compile code"				
+					sh "mvn compile"
+
+					echo "update build eform instance with Compile field as Pass"
+					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Compile\" : \"Pass\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000029CAS001\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+				}	
+			}
+		}	
+
+		stage('RunMavenJunit')
+		{
+			steps
+			{
+				script
+				{
+					try
+					{
+						echo "$STAGE_NAME"
+						def failedstage=env.STAGE_NAME
+						env.FAILED_STAGE=failedstage
+						echo "StageName is $FAILED_STAGE"
+
+						echo "execute junit tests"
+						sh "mvn clean test"
+
+						echo "update build eform instance with compile and Junit as pass"
+						sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"JUnit\": \"Pass\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000029CAS001\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+
+					}catch(Exception e){
+						
+						sh "exit 1"
+
+					}finally{
+
+					echo "Call Junit Parser and updated the results in Unit test Summary and create defect instance if any junit failures"                        
+	                
+	                sh "cd target/surefire-reports && zip -r junitresults.zip . && aws s3 cp junitresults.zip s3://ibmpilot/junit/junitresults.zip"
+	                
+	                sh "pip3 install -r requirements.txt"
+					
+					sh "python3 junit_parser.py -u 'admin_IBM' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc 'IBMC000029CAS001'"
+					}
+				}	
+			}
+		}
+
+		stage('RunSonar')
+		{	
+			steps
+			{
+				script
+				{
+					echo "$STAGE_NAME"
+					def failedstage=env.STAGE_NAME
+					env.FAILED_STAGE=failedstage
+					echo "StageName is $FAILED_STAGE"
+
+					echo "execute Sonar"
+					sh "mvn sonar:sonar -Dsonar.projectKey=spring-boot-mvn-courses -Dsonar.host.url=https://ibm-sonar.digite.com -Dsonar.login=7a0da1e648e56a6bfce26777c747b5cf6e0320e4"
+
+					echo "update build eform instance with Code Quality as pass"
+					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Code Quality\" : \"Pass\"}], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000029CAS001\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+
+					echo "Call Sonar Parser and updated the results in Unit test Summary"
+                    sh "pip3 install -r requirements.txt"
+					sh "python3 sonar_parser.py -t '$AUTH_TOKEN' -b $BUILD_EFORMID"										
+				}
+			}	
+		}
+
+		stage('CreateArtefact')
+		{
+			steps
+			{
+				script
+				{
+					echo "$STAGE_NAME"
+					def failedstage=env.STAGE_NAME
+					env.FAILED_STAGE=failedstage
+					echo "StageName is $FAILED_STAGE"
+
+					echo "Create Artefact"
+					sh "mvn clean install || :"
+					sh "cd target && aws s3 cp SwiftEntp-services-0.0.1-SNAPSHOT.jar s3://ibmpilot/artefact/ENTPservice.jar"
+
+					echo "update build eform instance with artefact values"
+					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Upload Artifact\" : \"Pass\", \"Artifact location\": \"https://ibmpilot.s3.amazonaws.com/artefact/ENTPservice.jar\"}], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000029CAS001\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""					
+				}	
+			}
+		}
+
+		stage('DeployBuild')
+		{
+			steps
+			{
+				script
+				{
+					echo "$STAGE_NAME"
+					def failedstage=env.STAGE_NAME
+					env.FAILED_STAGE=failedstage
+					echo "StageName is $FAILED_STAGE"
+
+					echo "Build Deployement Completed"
+
+					echo "update build eform Deploy Artifact field as Pass"
+					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Deploy Artifact\" : \"Pass\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000029CAS001\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+				}	
+			}
+		}
+
+		stage('ExecuteKarate')
+		{
+			steps
+			{
+				script
+				{
+					echo "$STAGE_NAME"
+					def failedstage=env.STAGE_NAME
+					env.FAILED_STAGE=failedstage
+					echo "StageName is $FAILED_STAGE"
+
+					echo "Execute Karate Completed"
+
+					echo "update build eform Deploy Artifact field as Pass"
+					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Karate\" : \"Pass\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000029CAS001\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+				}	
+			}
+		}				
+	}
+	post
+	{
+		success
+		{
+			echo "update build eform Build status field as Pass"
+			sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Build Status\" : \"Pass\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000029CAS001\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+		}
+		failure
+		{
+			script
+			{
+				if("$FAILED_STAGE" == "Compile"){
+					echo "update build eform instance with Compile and Build status as Failed"
+					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Compile\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000029CAS001\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+				}
+				else if("$FAILED_STAGE" == "RunSonar"){
+					echo "update build eform instance with Code Quality and Build Status as Failed"
+					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Code Quality\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000029CAS001\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+				}
+				else if("$FAILED_STAGE" == "CreateArtefact"){
+					echo "update build eform instance with CreateArtefact and Build Status as Failed"
+					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Upload Artifact\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000029CAS001\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+				}
+				else if("$FAILED_STAGE" == "DeployBuild"){
+					echo "update build eform instance with DeployBuild and Build Status as Failed"
+					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Deploy Artifact\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000029CAS001\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+				}
+				else if("$FAILED_STAGE" == "ExecuteKarate"){
+					echo "update build eform instance with ExecuteKarate and Build Status as Failed"
+					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Karate\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000029CAS001\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+				}
+			}	
+		}
+	}
+}
