@@ -209,7 +209,7 @@ pipeline
 					env.FAILED_STAGE=failedstage
 					echo "StageName is $FAILED_STAGE"
 
-					echo "Build Deployement Completed"
+					echo "Build Deployement Completed Finally"
 
 					echo "update build eform Deploy Artifact field as Pass"
 					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Deploy Artifact\" : \"Pass\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"IBMC000029CAS001\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
