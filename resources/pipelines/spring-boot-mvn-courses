@@ -209,9 +209,9 @@ pipeline
 					env.FAILED_STAGE=failedstage
 					echo "StageName is $FAILED_STAGE"
 
-					aws s3 cp s3://ibmpilot/artefact/ENTPservice.war /data/deploy2/ROOT.war
+					//aws s3 cp s3://ibmpilot/artefact/ENTPservice.war /data/deploy2/ROOT.war
 
-					docker restart tomcatalpine
+					//docker restart tomcatalpine
 
 					echo "Build Deployement Completed"
 
