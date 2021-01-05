@@ -1,0 +1,24 @@
+pipeline
+{
+	agent
+	{
+		label 'JenkinsHost'
+	}
+
+	stages
+	{
+		stage('Deploy')
+		{
+			steps
+			{
+				script
+				{
+					echo 'War Deployment started'
+                    sh "pwd && cd /data/deploy2/ && aws s3 cp s3://ibmpilot/artefact/ENTPservice.war /data/deploy2/ROOT.war"
+					sh "docker restart tomcatalpine"
+					echo 'War Deployment completed'
+				}
+            }
+        }
+    }
+}
