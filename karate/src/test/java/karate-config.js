@@ -1,6 +1,6 @@
 function fn() {
     var config = {
-        baseUrl : 'http://localhost:8081/ROOT'
+        baseUrl : 'http://10.0.0.21:8081/ROOT'
     };
     return config;
 }
