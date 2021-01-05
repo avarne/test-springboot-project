@@ -225,13 +225,14 @@ pipeline
 			{
 				script
 				{
-					try{
-		                                echo "$STAGE_NAME"
+					try
+					{
+		                echo "$STAGE_NAME"
 						def failedstage=env.STAGE_NAME
 						env.FAILED_STAGE=failedstage
 						echo "StageName is $FAILED_STAGE"
 		                                
-		                                echo "execute junit tests"
+		                echo "execute junit tests"
 						sh "cd karate && mvn clean test"
 
 						echo "Execute Karate Completed"
@@ -239,13 +240,16 @@ pipeline
 						//echo "update build eform Deploy Artifact field as Pass"
 						//sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Karate\" : \"Pass\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 
-				        }catch(Exception e){
+				    }catch(Exception e){
+						
 						sh "exit 1"
+
 					}finally{
+						
 						echo "Update the results in Karate test Summary"                    
-			                        sh "cd karate/target/surefire-reports && zip -r karateresults.zip . && aws s3 cp karateresults.zip s3://ibmpilot/karate/karateresults.zip"
+			            sh "cd karate/target/surefire-reports && zip -r karateresults.zip . && aws s3 cp karateresults.zip s3://ibmpilot/karate/karateresults.zip"
 					}
-                                }	
+                }	
 			}
 		}				
 	}
