@@ -43,6 +43,7 @@ def xmlparser():
     failure_info = {
         "Name": build_code + ":JunitFailure",
         "Priority": "High",
+        "Build ID": build_code,
         "Date Identified": time,
         "Description": testcases,
         "Bug Origin": "SE"

@@ -51,7 +51,7 @@ pipeline
 		            echo "'itemcode is $ITEM_CODE'"
 
 					echo 'executing curl to create buildeform instance'
-			        def response = sh(script: """curl -X POST "https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData" -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$BUILD_NUMBER:$GIT_REPO_NAME\", \"Pipeline URL\" : \"https://ibm-jenkins.digite.com/job/TestingPipeline/job/spring-boot-mvn-courses/$BUILD_NUMBER\", \"Job ID\" : \"$BUILD_NUMBER\", \"JIRA Project ID\" : \"$PROJ_CODE\", \"JIRA Issue ID\" : \"$ITEM_CODE\",  \"Pre Requisite\" : \"Skipped\", \"Compile\" : \"Skipped\", \"JUnit\" : \"Skipped\", \"Code Quality\" : \"Skipped\", \"Upload Artifact\" : \"Skipped\", \"Deploy Artifact\" : \"Skipped\", \"Karate\" : \"Skipped\", \"Build Status\" : \"In Progress\", }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"BULD_f\" }}'""", returnStdout: true)
+			        def response = sh(script: """curl -X POST "https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData" -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$BUILD_NUMBER:$GIT_REPO_NAME\", \"Pipeline URL\" : \"https://ibm-jenkins.digite.com/job/TestingPipeline/job/spring-boot-mvn-courses/$BUILD_NUMBER\", \"Job ID\" : \"$BUILD_NUMBER\", \"JIRA Project ID\" : \"$PROJ_CODE\", \"JIRA Issue ID\" : \"$ITEM_CODE\",  \"Pre Requisite\" : \"Pending\", \"Compile\" : \"Pending\", \"JUnit\" : \"Pending\", \"Code Quality\" : \"Pending\", \"Upload Artifact\" : \"Pending\", \"Deploy Artifact\" : \"Pending\", \"Karate\" : \"Pending\", \"Build Status\" : \"In Progress\", }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"BULD_f\" }}'""", returnStdout: true)
                      
                     def responseObject = readJSON text: response
                     def ID = "$responseObject.data.ItemCode"
@@ -208,10 +208,8 @@ pipeline
 					def failedstage=env.STAGE_NAME
 					env.FAILED_STAGE=failedstage
 					echo "StageName is $FAILED_STAGE"
-
-					//aws s3 cp s3://ibmpilot/artefact/ENTPservice.war /data/deploy2/ROOT.war
-
-					//docker restart tomcatalpine
+					
+					build job: 'deploywar'
 
 					echo "Build Deployement Completed"
 
@@ -227,8 +225,9 @@ pipeline
 			{
 				script
 				{
-					try{
-		                                echo "$STAGE_NAME"
+					try
+					{
+		                echo "$STAGE_NAME"
 						def failedstage=env.STAGE_NAME
 						env.FAILED_STAGE=failedstage
 						echo "StageName is $FAILED_STAGE"
@@ -241,15 +240,18 @@ pipeline
 						//echo "update build eform instance with karate as Pass"
 						//sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Karate\" : \"Pass\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 
-				        }catch(Exception e){
+				    }catch(Exception e){
+						
 						sh "exit 1"
+
 					}finally{
-						echo "Update the results in Karate test Summary"                    
-			                        sh "cd karate/target/surefire-reports && zip -r karateresults.zip . && aws s3 cp karateresults.zip s3://ibmpilot/karate/karateresults.zip"
+						
+						echo "Update the results in Karate test Summary"
+			            sh "cd karate/target/surefire-reports && zip -r karateresults.zip . && aws s3 cp karateresults.zip s3://ibmpilot/karate/karateresults.zip"
 					        sh "pip3 install -r requirements.txt"
 					        sh "python3 karate_parser.py -u 'admin_IBM' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE"
-                                        }
-                                }	
+            }
+         }
 			}
 		}				
 	}
