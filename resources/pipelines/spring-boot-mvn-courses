@@ -232,13 +232,13 @@ pipeline
 						env.FAILED_STAGE=failedstage
 						echo "StageName is $FAILED_STAGE"
 		                                
-		                echo "execute junit tests"
-						sh "cd karate && mvn clean test"
+		        echo "execute karate tests"
+						sh "cd karate && mvn clean -Dtest=CucumberReportParallelRunner test"
 
 						echo "Execute Karate Completed"
 		                                
-						echo "update build eform instance with karate as Pass"
-						sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Karate\" : \"Pass\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+						//echo "update build eform instance with karate as Pass"
+						//sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Karate\" : \"Pass\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 
 				    }catch(Exception e){
 						
@@ -246,10 +246,12 @@ pipeline
 
 					}finally{
 						
-						echo "Update the results in Karate test Summary"                    
+						echo "Update the results in Karate test Summary"
 			            sh "cd karate/target/surefire-reports && zip -r karateresults.zip . && aws s3 cp karateresults.zip s3://ibmpilot/karate/karateresults.zip"
-					}
-                }	
+					        sh "pip3 install -r requirements.txt"
+					        sh "python3 karate_parser.py -u 'admin_IBM' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE"
+            }
+         }
 			}
 		}				
 	}
