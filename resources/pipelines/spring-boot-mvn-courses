@@ -234,7 +234,7 @@ pipeline
 						echo "StageName is $FAILED_STAGE"
 		                                
 		                                echo "execute junit tests"
-						sh "cd karate && mvn clean -Dtest=CucumberReportParallelRunner test"
+						sh "cd karate && mvn clean test"
 
 						echo "Execute Karate Completed"
 		                                

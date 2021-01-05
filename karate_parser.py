@@ -1,5 +1,7 @@
 import argparse
+from bs4 import BeautifulSoup
 import os
+import datetime
 import requests
 import json
 
@@ -24,23 +26,98 @@ m_Dir = m_filePath + os.sep + "karate" + os.sep + "target" + os.sep + "surefire-
 files = os.listdir(m_Dir)
 
 
-def parse_karate_report():
-    filePath = m_Dir
-    with open(filePath + "/results-json.txt", "r", encoding="UTF-8") as f1:
-        content1 = f1.read()
-    data1 = json.loads(content1)
-    test_count = data1["scenarios"]
-    passed_count = data1["passed"]
-    failure_count = data1["failed"]
-    test_dict = {"tests": test_count, "passed": passed_count, "failures": failure_count}
-    # print(test_dict)
-    return test_dict
+def myconverter(o):
+    if isinstance(o, datetime.datetime):
+        return o.__str__()
 
 
-def push_data_to_se(data_json, authToken):
+def xmlparser():
+    testcases = []
+    time = datetime.datetime.today().strftime('%d-%b-%Y %H:%M:%S')
+    for filename in files:
+        if filename.lower().endswith(".xml"):
+            with open(m_Dir + os.sep + filename, "r") as f:
+                content = f.read()
+            soup = BeautifulSoup(content, 'xml')
+            for row in soup.find_all("testsuite"):
+                for tc in row.find_all("testcase"):
+                    failure = tc.find('failure')
+                    error = tc.find('error')
+                    if failure or error:
+                        name = tc.get('name')
+                        if "[1][1]" in name:
+                            name = str(name).replace("[1][1]", "")
+                        testcases.append(name)
+    failure_info = {
+        "Name": build_code + ":KarateFailure",
+        "Priority": "High",
+        "Build ID": build_code,
+        "Date Identified": time,
+        "Description": testcases,
+        "Bug Origin": "SE"
+    }
+    # print(testcases)
+    return failure_info
+
+
+def testcount():
+    testcount = 0
+    errorcount = 0
+    failurecount = 0
+    count1 = 0
+    count2 = 0
+    count3 = 0
+    for filename in files:
+        if filename.lower().endswith(".xml"):
+            with open(m_Dir + os.sep + filename, "r") as f:
+                content = f.read()
+            soup = BeautifulSoup(content, 'xml')
+            for row in soup.find_all("testsuite"):
+                a = int(row.get('tests'))
+                c = a + testcount
+                testcount = c
+            for row in soup.find_all("testsuite"):
+                a = int(row.get('errors'))
+                c = a + errorcount
+                errorcount = c
+            for row in soup.find_all("testsuite"):
+                a = int(row.get('failures'))
+                c = a + failurecount
+                failurecount = c
+    count1 = count1 + testcount
+    count2 = count2 + errorcount
+    count3 = count3 + failurecount
+    failed_test_count = count2 + count3
+    passed_test_count = count1 - failed_test_count
+    # dict = {'tests': count1, 'errors': count2, 'failures': count3, 'pass': passed_test_count}
+    # print(dict)
+    push_test_results(count1, passed_test_count, failed_test_count)
+    if failed_test_count > 0:
+        create_work_task(se_url, username, se_auth_token, owner_code, xmlparser())
+
+
+def create_work_task(swift_deployment, username, auth_token, owner_code, issue_metadata_list):
+    create_eform_endpoint = '/rest/v2/api/EFormService/createEformDataInBulk'
+    url = swift_deployment + create_eform_endpoint
+    header = {'AuthorizationToken': auth_token}
+    create_eform_request_body = {
+        "data": {
+            "FieldsData": [issue_metadata_list],
+            "CreatorLoginId": username,
+            "OwnerType": "Prj",
+            "OwnerCode": owner_code,
+            "ItemType": item_type
+        }
+    }
+    # print(create_eform_request_body)
+    response = requests.post(url, json=create_eform_request_body, headers=header)
+    print(response.json())
+
+
+def push_test_results(total_tests, passed_tests, failed_tests):
     url = se_url + "/rest/v2/api/EFormService/modifyEFormItemData"
     print(url)
-    if data_json["failures"] > 0:
+    if failed_tests > 0:
         build_status = "Failed"
         karate_status = "Failed"
     else:
@@ -48,9 +125,9 @@ def push_data_to_se(data_json, authToken):
         karate_status = "Pass"
     fields_data = {
         "Type Of Integration Test": "Karate",
-        "Total Integration Script Count": str(data_json["tests"]),
-        "Pass Integration Scripts Count": str(data_json["passed"]),
-        "Failed Integration Scripts Count": str(data_json["failures"]),
+        "Total Integration Script Count": total_tests,
+        "Pass Integration Scripts Count": passed_tests,
+        "Failed Integration Scripts Count": failed_tests,
         "Build Status": build_status,
         "Karate": karate_status
         }
@@ -66,11 +143,10 @@ def push_data_to_se(data_json, authToken):
         }
     }
     # print(input_data)
-    headers = {"AuthorizationToken": str(authToken), "Content-Type": "application/json"}
+    headers = {"AuthorizationToken": str(se_auth_token), "Content-Type": "application/json"}
     resp = requests.put(url=url, json=input_data, headers=headers)
     print(resp.text, str(resp.status_code))
 
 
-field_json = parse_karate_report()
-push_data_to_se(field_json, se_auth_token)
+testcount()
 
