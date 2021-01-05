@@ -19,7 +19,7 @@ public class StudentService {
 	static {
 		//Initialize Data
 		Course course1 = new Course("Course1", "Spring", "10 Steps", Arrays
-				.asList("Learn Mavens", "Import Project", "First Example",
+				.asList("Learn Maven", "Import Project", "First Example",
 						"Second Example"));
 		Course course2 = new Course("Course2", "Spring MVC", "10 Examples",
 				Arrays.asList("Learn Maven", "Import Project", "First Example",
