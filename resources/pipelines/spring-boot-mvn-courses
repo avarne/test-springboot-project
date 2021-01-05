@@ -231,6 +231,9 @@ pipeline
 					def failedstage=env.STAGE_NAME
 					env.FAILED_STAGE=failedstage
 					echo "StageName is $FAILED_STAGE"
+                                        
+                                        echo "execute junit tests"
+				        sh "cd karate && mvn clean test"
 
 					echo "Execute Karate Completed"
 
