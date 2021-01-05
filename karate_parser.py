@@ -106,7 +106,7 @@ def create_work_task(swift_deployment, username, auth_token, owner_code, issue_m
             "CreatorLoginId": username,
             "OwnerType": "Prj",
             "OwnerCode": owner_code,
-            "ItemType": item_type
+            "ItemType": "ABUG"
         }
     }
     # print(create_eform_request_body)
