@@ -51,7 +51,7 @@ pipeline
 		            echo "'itemcode is $ITEM_CODE'"
 
 					echo 'executing curl to create buildeform instance'
-			        def response = sh(script: """curl -X POST "https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData" -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$BUILD_NUMBER:$GIT_REPO_NAME\", \"Pipeline URL\" : \"https://ibm-jenkins.digite.com/job/TestingPipeline/job/spring-boot-mvn-courses/$BUILD_NUMBER\", \"Job ID\" : \"$BUILD_NUMBER\", \"JIRA Project ID\" : \"$PROJ_CODE\", \"JIRA Issue ID\" : \"$ITEM_CODE\",  \"Pre Requisite\" : \"Skipped\", \"Compile\" : \"Skipped\", \"JUnit\" : \"Skipped\", \"Code Quality\" : \"Skipped\", \"Upload Artifact\" : \"Skipped\", \"Deploy Artifact\" : \"Skipped\", \"Karate\" : \"Skipped\", \"Build Status\" : \"In Progress\", }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"BULD_f\" }}'""", returnStdout: true)
+			        def response = sh(script: """curl -X POST "https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData" -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$BUILD_NUMBER:$GIT_REPO_NAME\", \"Pipeline URL\" : \"https://ibm-jenkins.digite.com/job/TestingPipeline/job/spring-boot-mvn-courses/$BUILD_NUMBER\", \"Job ID\" : \"$BUILD_NUMBER\", \"JIRA Project ID\" : \"$PROJ_CODE\", \"JIRA Issue ID\" : \"$ITEM_CODE\",  \"Pre Requisite\" : \"Pending\", \"Compile\" : \"Pending\", \"JUnit\" : \"Pending\", \"Code Quality\" : \"Pending\", \"Upload Artifact\" : \"Pending\", \"Deploy Artifact\" : \"Pending\", \"Karate\" : \"Pending\", \"Build Status\" : \"In Progress\", }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"BULD_f\" }}'""", returnStdout: true)
                      
                     def responseObject = readJSON text: response
                     def ID = "$responseObject.data.ItemCode"
@@ -208,10 +208,8 @@ pipeline
 					def failedstage=env.STAGE_NAME
 					env.FAILED_STAGE=failedstage
 					echo "StageName is $FAILED_STAGE"
-
-					//aws s3 cp s3://ibmpilot/artefact/ENTPservice.war /data/deploy2/ROOT.war
-
-					//docker restart tomcatalpine
+					
+					build job: 'Deploywar',
 
 					echo "Build Deployement Completed"
 
