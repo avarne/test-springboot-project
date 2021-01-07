@@ -82,7 +82,7 @@ pipeline
 	                def carratfile = gitdifarr.join('^^')
 	                echo "'$carratfile'"
 
-	                def gitdiffurl = 'https://github.com/CAS-IBM/spring-boot-mvn-courses/commit/'+$GIT_COMMIT
+	                def gitdiffurl = 'https://github.com/CAS-IBM/spring-boot-mvn-courses/commit/'+"$GIT_COMMIT"
 	                echo "'$gitdiffurl'"
 	                                        
 	                //def gitchangecount = sh(script: "git whatchanged -1 --format=format:oneline | wc -l", returnStdout: true).trim()

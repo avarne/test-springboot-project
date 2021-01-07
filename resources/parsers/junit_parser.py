@@ -43,7 +43,6 @@ def xmlparser():
                         testcases.append(name)
     failure_info = {
         "Name": build_code + ":JunitFailure",
-        "Priority": "High",
         "Build ID": build_code,
         "Date Identified": time,
         "Junit Failures": testcases,
