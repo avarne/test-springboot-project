@@ -81,6 +81,9 @@ pipeline
 					echo "'$gitdifarr'"
 	                def carratfile = gitdifarr.join('^^')
 	                echo "'$carratfile'"
+
+	                def gitdiffurl = 'https://github.com/CAS-IBM/spring-boot-mvn-courses/commit/'+'$GIT_COMMIT'
+	                echo "'$gitdiffurl'"
 	                                        
 	                //def gitchangecount = sh(script: "git whatchanged -1 --format=format:oneline | wc -l", returnStdout: true).trim()
 	                //echo "'$gitchangecount'"                                        
@@ -88,7 +91,7 @@ pipeline
 					echo "'$GIT_COMMIT' '$GIT_URL' '$Git_COMMIT_DATE' '$GIT_COMMIT_AUTHOR' '$GIT_COMMIT_MSG' '$GIT_BRANCH'"
 						                    
 					echo 'executing curl to create oncomit instance'
-					sh """curl -X POST https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$GIT_COMMIT\", \"Author\" : \"$GIT_COMMIT_AUTHOR\", \"Commit Date\" : \"$Git_COMMIT_DATE\", \"Commit Comment\" : \"$GIT_COMMIT_MSG\", \"Files Changed\" : \"$carratfile\", \"Git URL\" : \"$GIT_URL\", \"Git Branch\" : \"$GIT_BRANCH\", \"JIRA Project ID\" : \"$PROJ_CODE\", \"JIRA Issue ID\" : \"$ITEM_CODE\", \"ECR_Changed File List\" : \"$carratfile\", \"Build ID\" : \"$BUILD_EFORMID\",  \"Commit Description\" : \"Test comit\", }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"GITC_f\" }}' """
+					sh """curl -X POST https://ibm.digite.com/rest/v2/api/EFormService/createEFormItemData -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$GIT_COMMIT\", \"Author\" : \"$GIT_COMMIT_AUTHOR\", \"Commit Date\" : \"$Git_COMMIT_DATE\", \"Commit Comment\" : \"$GIT_COMMIT_MSG\", \"Files Changed\" : \"$carratfile\", \"Git URL\" : \"$GIT_URL\", \"Git Diff URL\" : \"$gitdiffurl\", \"Git Branch\" : \"$GIT_BRANCH\", \"JIRA Project ID\" : \"$PROJ_CODE\", \"JIRA Issue ID\" : \"$ITEM_CODE\", \"ECR_Changed File List\" : \"$carratfile\", \"Build ID\" : \"$BUILD_EFORMID\",  \"Commit Description\" : \"Test comit\", }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"GITC_f\" }}' """
 
 					echo "update build eform instance with Pre Requisite field as Pass"
 					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Pre Requisite\" : \"Pass\" }], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""		                    
