@@ -145,9 +145,9 @@ pipeline
 	                
 	                sh "cd target/surefire-reports && zip -r junitresults.zip . && aws s3 cp junitresults.zip s3://ibmpilot/junit/junitresults.zip"
 	                
-	                sh "pip3 install -r requirements.txt"
+	                sh "pip3 install -r resources/parsers/requirements.txt"
 					
-					sh "python3 junit_parser.py -u 'admin_IBM' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE"
+					sh "python3 resources/parsers/junit_parser.py -u 'admin_IBM' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE"
 					}
 				}	
 			}
@@ -171,8 +171,8 @@ pipeline
 					sh """curl -X PUT https://ibm.digite.com/rest/v2/api/EFormService/modifyEformItemUsingItemCode -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Code Quality\" : \"Pass\"}], \"CreatorLoginId\":\"admin_IBM\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"BULD_f\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 
 					echo "Call Sonar Parser and updated the results in Unit test Summary"
-                    sh "pip3 install -r requirements.txt"
-					sh "python3 sonar_parser.py -t '$AUTH_TOKEN' -b $BUILD_EFORMID -oc $OWNERCODE"										
+                    sh "pip3 install -r resources/parsers/requirements.txt"
+					sh "python3 resources/parsers/sonar_parser.py -t '$AUTH_TOKEN' -b $BUILD_EFORMID -oc $OWNERCODE"										
 				}
 			}	
 		}
@@ -248,8 +248,8 @@ pipeline
 						
 						echo "Update the results in Karate test Summary"
 			            sh "cd karate/target/surefire-reports && zip -r karateresults.zip . && aws s3 cp karateresults.zip s3://ibmpilot/karate/karateresults.zip"
-					        sh "pip3 install -r requirements.txt"
-					        sh "python3 karate_parser.py -u 'admin_IBM' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE"
+					        sh "pip3 install -r resources/parsers/requirements.txt"
+					        sh "python3 resources/parsers/karate_parser.py -u 'admin_IBM' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE"
             }
          }
 			}
