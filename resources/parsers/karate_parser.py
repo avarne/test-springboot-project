@@ -54,7 +54,7 @@ def xmlparser():
         "Priority": "High",
         "Build ID": build_code,
         "Date Identified": time,
-        "Description": testcases,
+        "Karate Failures": testcases,
         "Bug Origin": "SE"
     }
     # print(testcases)
