@@ -13,6 +13,7 @@ PARSER.add_argument("-u", "--USERNAME", default="admin_IBM")
 PARSER.add_argument("-auth", "--AUTH_CODE", default="dfgjktuierjh")
 PARSER.add_argument("-url", "--SE_URL", default='https://ibm.digite.com')
 PARSER.add_argument("-ity", "--ITEM_TYPE", default='BULD_f')
+PARSER.add_argument("-jui", "--JIRA_UST_ID", default="ICP-71")
 ARGS = PARSER.parse_args()
 
 username = str(ARGS.USERNAME)
@@ -21,6 +22,7 @@ se_auth_token = str(ARGS.AUTH_CODE)
 build_code = str(ARGS.BUILD_CODE)
 se_url = str(ARGS.SE_URL)
 item_type = str(ARGS.ITEM_TYPE)
+jira_ust_id =str(ARGS.JIRA_UST_ID)
 m_filePath = os.getcwd()
 m_filePath = str(m_filePath).replace("/resources/parsers", "")
 m_Dir = m_filePath + os.sep + "karate" + os.sep + "target" + os.sep + "surefire-reports"
@@ -50,10 +52,12 @@ def xmlparser():
                             name = str(name).replace("[1][1]", "")
                         testcases.append(name)
     failure_info = {
-        "Name": build_code + ":KarateFailure",
+        "Name": jira_ust_id + ":" + build_code + ":KarateFailure",
         "Build ID": build_code,
         "Date Identified": time,
         "Karate Failures": testcases,
+        "JIRA UST ID": jira_ust_id,
+        "Type of DevOps Defect": "Junit",
         "Bug Origin": "SE"
     }
     # print(testcases)
