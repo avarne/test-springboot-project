@@ -57,7 +57,7 @@ def xmlparser():
         "Date Identified": time,
         "Karate Failures": testcases,
         "JIRA UST ID": jira_ust_id,
-        "Type of DevOps Defect": "Junit",
+        "Type of DevOps Defect": "Karate",
         "Bug Origin": "SE"
     }
     # print(testcases)
