@@ -150,7 +150,7 @@ pipeline
 	                
 	                sh "pip3 install -r resources/parsers/requirements.txt"
 					
-					sh "python3 resources/parsers/junit_parser.py -u 'admin_IBM' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE"
+					sh "python3 resources/parsers/junit_parser.py -u 'admin_IBM' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE"
 					}
 				}	
 			}
