@@ -9,12 +9,14 @@ PARSER.add_argument("-oc", "--OWNER_CODE", default='IBMC000001INTG')
 PARSER.add_argument("-bi", "--BUILD_CODE", default="BLD833")
 PARSER.add_argument("-u", "--USERNAME", default="azure devops")
 PARSER.add_argument("-auth", "--AUTH_CODE", default="test")
+PARSER.add_argument("-jui", "--JIRA_UST_ID", default="ICP-71")
 ARGS = PARSER.parse_args()
 
 username = str(ARGS.USERNAME)
 owner_code = str(ARGS.OWNER_CODE)
 auth_token = str(ARGS.AUTH_CODE)
 build_code =str(ARGS.BUILD_CODE)
+jira_ust_id =str(ARGS.JIRA_UST_ID)
 swift_deployment = "https://ibm.digite.com"
 m_filePath = os.getcwd()
 m_filePath = str(m_filePath).replace("/resources/parsers", "")
@@ -42,10 +44,12 @@ def xmlparser():
                         name = tc.get('name')
                         testcases.append(name)
     failure_info = {
-        "Name": build_code + ":JunitFailure",
+        "Name": jira_ust_id + ":" + build_code + ":JunitFailure",
         "Build ID": build_code,
         "Date Identified": time,
         "Junit Failures": testcases,
+        "JIRA UST ID": jira_ust_id,
+        "Type of DevOps Defect": "Junit",
         "Bug Origin": "SE"
     }
     return failure_info
