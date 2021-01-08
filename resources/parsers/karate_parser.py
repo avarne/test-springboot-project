@@ -36,7 +36,7 @@ def myconverter(o):
 
 def xmlparser():
     testcases = []
-    time = datetime.datetime.today().strftime('%d-%b-%Y %H:%M:%S')
+    time = (datetime.date.today() + datetime.timedelta(days = 1)).strftime('%d-%b-%Y %H:%M:%S')
     for filename in files:
         if filename.lower().endswith(".xml"):
             with open(m_Dir + os.sep + filename, "r") as f:
