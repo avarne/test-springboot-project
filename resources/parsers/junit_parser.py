@@ -2,9 +2,7 @@ import argparse
 from bs4 import BeautifulSoup
 import os
 import datetime
-from dateutil import tz
 import requests
-
 
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument("-oc", "--OWNER_CODE", default='IBMC000001INTG')
@@ -32,7 +30,7 @@ def myconverter(o):
 
 def xmlparser():
     testcases = []
-    time = datetime.datetime.today().astimezone(tz.gettz('Etc/UTC')).strftime('%d-%b-%Y %H:%M:%S')
+    time = datetime.datetime.today().strftime('%d-%b-%Y %H:%M:%S')+datetime.timedelta(days = 1) 
     for filename in files:
         if filename.lower().endswith(".xml"):
             with open(m_Dir + os.sep + filename, "r") as f:
