@@ -3,17 +3,28 @@ def VERSION
 def FIX
 def RELEASE
 
-node {
-   props = readProperties file:'props.txt'
-   VERSION = props['version']
-   FIX = props['fix']
-   RELEASE = VERSION + "_" + FIX
-}
+pipeline
+{
+	agent
+	{
+		label 'JenkinsHost'
+	}
 
-pipeline {
-   stages {
-      stage('Build') {
-         echo ${RELEASE}
-      }
-   }
+	stages
+	{
+		stage('Build')
+		{
+			steps
+			{
+				script
+				{
+					props = readProperties file:'props.txt'
+   					VERSION = props['version']
+   					FIX = props['fix']
+   					RELEASE = VERSION + "_" + FIX
+					echo ${RELEASE}
+				}
+            }
+        }
+    }
 }
