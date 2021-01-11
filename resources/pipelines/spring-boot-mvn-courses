@@ -175,7 +175,7 @@ pipeline
 
 					echo "Call Sonar Parser and updated the results in Unit test Summary"
                     sh "pip3 install -r resources/parsers/requirements.txt"
-					sh "python3 resources/parsers/sonar_parser.py -t '$AUTH_TOKEN' -b $BUILD_EFORMID -oc $OWNERCODE" -jui $ITEM_CODE"									
+					sh "python3 resources/parsers/sonar_parser.py -t '$AUTH_TOKEN' -b $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE"									
 				}
 			}	
 		}
