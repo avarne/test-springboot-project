@@ -1,4 +1,4 @@
-def props
+env.props
 def VERSION
 def FIX
 def RELEASE
@@ -18,7 +18,7 @@ pipeline
 			{
 				script
 				{
-					def props = readProperties file:'/resources/pipelines/props.txt'
+					props = readProperties file:'/resources/pipelines/props.properties'
    					VERSION = props['version']
    					FIX = props['fix']
    					RELEASE = VERSION + "_" + FIX
