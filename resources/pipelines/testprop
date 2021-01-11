@@ -18,7 +18,7 @@ pipeline
 			{
 				script
 				{
-					props = readProperties file:'props.txt'
+					props = readProperties file:'/resources/pipelines/props.txt'
    					VERSION = props['version']
    					FIX = props['fix']
    					RELEASE = VERSION + "_" + FIX
