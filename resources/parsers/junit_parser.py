@@ -15,8 +15,8 @@ ARGS = PARSER.parse_args()
 username = str(ARGS.USERNAME)
 owner_code = str(ARGS.OWNER_CODE)
 auth_token = str(ARGS.AUTH_CODE)
-build_code =str(ARGS.BUILD_CODE)
-jira_ust_id =str(ARGS.JIRA_UST_ID)
+build_code = str(ARGS.BUILD_CODE)
+jira_ust_id = str(ARGS.JIRA_UST_ID)
 swift_deployment = "https://ibm.digite.com"
 m_filePath = os.getcwd()
 m_filePath = str(m_filePath).replace("/resources/parsers", "")
@@ -47,9 +47,9 @@ def xmlparser():
         "Name": jira_ust_id + ":" + build_code + ":JunitFailure",
         "Build ID": build_code,
         "Date Identified": time,
-        "Junit Failures": testcases,
+        "Junit Failures":"Please find below failed TestScripts: \n"+str(testcases),
         "JIRA UST ID": jira_ust_id,
-        "Type of Bug": "Junit",
+        "Type of Bug": "JUnit",
         "Bug Origin": "SE"
     }
     return failure_info
@@ -112,15 +112,18 @@ def push_test_results(total_tests, passed_tests, failed_tests):
     if failed_tests>0:
         BuildStatus="Failed"
         JunitJaCoCo="Failed"
+        JunitFailures=xmlparser()["Junit Failures"]
     else:
         BuildStatus="Pass"
         JunitJaCoCo="Pass"
+        JunitFailures = ""
     Data={"Type Of Unit Test":"JUnit",
           "Total Unit Script Count":total_tests,
           "Pass Unit Scripts Count":passed_tests,
           "Failed Unit Scripts Count":failed_tests,
           "Build Status":BuildStatus,
-          "JUnit":JunitJaCoCo}
+          "JUnit":JunitJaCoCo,
+          "Junit Failures":str(JunitFailures)}
     print(Data)
     modify_eform_req_body = {
         "data":{

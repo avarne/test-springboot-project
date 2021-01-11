@@ -55,7 +55,7 @@ def xmlparser():
         "Name": jira_ust_id + ":" + build_code + ":KarateFailure",
         "Build ID": build_code,
         "Date Identified": time,
-        "Karate Failures": testcases,
+        "Karate Failures": "Please find below failed TestScripts: \n"+str(testcases),
         "JIRA UST ID": jira_ust_id,
         "Type of Bug": "Karate",
         "Bug Origin": "SE"
@@ -124,16 +124,19 @@ def push_test_results(total_tests, passed_tests, failed_tests):
     if failed_tests > 0:
         build_status = "Failed"
         karate_status = "Failed"
+        karateFailures=xmlparser()["Karate Failures"]
     else:
         build_status = "Pass"
         karate_status = "Pass"
+        karateFailures=""
     fields_data = {
         "Type Of Integration Test": "Karate",
         "Total Integration Script Count": total_tests,
         "Pass Integration Scripts Count": passed_tests,
         "Failed Integration Scripts Count": failed_tests,
         "Build Status": build_status,
-        "Karate": karate_status
+        "Karate": karate_status,
+        "Karate Failures": str(karateFailures)
         }
     # print(fields_data)
     input_data = {
@@ -153,4 +156,3 @@ def push_test_results(total_tests, passed_tests, failed_tests):
 
 
 testcount()
-
