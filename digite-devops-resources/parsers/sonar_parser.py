@@ -2,6 +2,9 @@ import json
 import requests
 import argparse
 import datetime
+import pytz
+
+timeZ_utc = pytz.timezone('Etc/UTC')
 
 
 PARSER = argparse.ArgumentParser()
@@ -100,7 +103,7 @@ def create_bug(auth_token):
     create_eform_endpoint = '/rest/v2/api/EFormService/createEformDataInBulk'
     url = se_url + create_eform_endpoint
     header = {'AuthorizationToken': auth_token}
-    time = (datetime.date.today() + datetime.timedelta(days = 1)).strftime('%d-%b-%Y %H:%M:%S')
+    time = datetime.datetime.now(timeZ_utc).strftime('%d-%b-%Y %H:%M:%S')
     failure_info = {
         "Name": jira_ust_id + ":" + build_eform_itemcode + ":SonarQubeFailure",
         "Build ID": build_eform_itemcode,
