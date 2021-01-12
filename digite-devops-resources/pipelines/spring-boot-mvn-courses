@@ -12,6 +12,8 @@ env.ITEMTYPEGITCOMIT=""
 env.AUTH_TOKEN=""
 env.ENTP_URL=""
 env.CREATE_EFORM=""
+env.CREATE_BULK_EFORM=""
+env.MODIFY_EFORM_USING_ITEMCODE=""
 env.MODIFY_EFORM=""
 env.GITHUB_URL=""
 env.JUNIT_RESULT=""
@@ -43,13 +45,13 @@ pipeline
 					echo "owner code is $OWNERCODE"
 
 					CREATORLOGINID = props['creatorloginid']
-					echo "owner code is $CREATORLOGINID"
+					echo "Login Id is $CREATORLOGINID"
 
 					ITEMTYPEBUILD = props['item_type_build']
-					echo "owner code is $ITEMTYPEBUILD"
+					echo "Item Type Build is $ITEMTYPEBUILD"
 
 					ITEMTYPEGITCOMIT = props['item_type_gitcomit']
-					echo "owner code is $ITEMTYPEGITCOMIT"
+					echo "Item Type Comit is $ITEMTYPEGITCOMIT"
 
 					AUTH_TOKEN = props['auth_token']
 					echo "Token is $AUTH_TOKEN"
@@ -60,8 +62,14 @@ pipeline
 					CREATE_EFORM = "$ENTP_URL"+props['create_eform']
 					echo "Create eform is $CREATE_EFORM"
 
+					CREATE_BULK_EFORM = "$ENTP_URL"+props['create_bulk_eform']
+					echo "Create bulk eform data is $CREATE_BULK_EFORM"
+
+					MODIFY_EFORM_USING_ITEMCODE = "$ENTP_URL"+props['modify_eform_using_itemcode']
+					echo "Modify Eform Using Itemcode is $MODIFY_EFORM_USING_ITEMCODE"
+
 					MODIFY_EFORM = "$ENTP_URL"+props['modify_eform']
-					echo "Modify eform is $MODIFY_EFORM"
+					echo "Modify eform is $MODIFY_EFORM_USING_ITEMCODE"
 					
 					GITHUB_URL = props['github_url']
 					echo "github url is $GITHUB_URL"
@@ -73,7 +81,7 @@ pipeline
 					echo "karate result url is $KARATE_RESULT"
 
 					ARTEFACT_PATH= props['s3_url']+props['artefact_path']
-					echo "artefact path url is $ARTEFACT_PATH"
+					echo "artefact path is $ARTEFACT_PATH"
 
 					ARTIFACT_LOCATION = props['artifact_location']
 					echo "artifact location url is $ARTIFACT_LOCATION"
@@ -85,7 +93,7 @@ pipeline
 					echo "sonar_url is $SONAR_URL"
 
 					SONAR_LOGINID = props['sonar_loginid']
-					echo "sonar_loginid 'is $SONAR_LOGINID"
+					echo "sonar_loginid is $SONAR_LOGINID"
 
 					echo "$STAGE_NAME"
 					def failedstage=env.STAGE_NAME
@@ -160,7 +168,7 @@ pipeline
 					sh """curl -X POST $CREATE_EFORM -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Name\" : \"$GIT_COMMIT\", \"Author\" : \"$GIT_COMMIT_AUTHOR\", \"Commit Date\" : \"$Git_COMMIT_DATE\", \"Commit Comment\" : \"$GIT_COMMIT_MSG\", \"Files Changed\" : \"$carratfile\", \"Git URL\" : \"$GIT_URL\", \"Git Diff URL\" : \"$gitdiffurl\", \"Git Branch\" : \"$GIT_BRANCH\", \"JIRA Project ID\" : \"$PROJ_CODE\", \"JIRA Issue ID\" : \"$ITEM_CODE\", \"ECR_Changed File List\" : \"$carratfile\", \"Build ID\" : \"$BUILD_EFORMID\",  \"Commit Description\" : \"Test comit\", }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEGITCOMIT\" }}' """
 
 					echo "update build eform instance with Pre Requisite field as Pass"
-					sh """curl -X PUT $MODIFY_EFORM -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Pre Requisite\" : \"Pass\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""		                    
+					sh """curl -X PUT $MODIFY_EFORM_USING_ITEMCODE -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Pre Requisite\" : \"Pass\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""		                    
 				}
 			}
 		}
@@ -180,7 +188,7 @@ pipeline
 					sh "mvn compile"
 
 					echo "update build eform instance with Compile field as Pass"
-					sh """curl -X PUT $MODIFY_EFORM -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Compile\" : \"Pass\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+					sh """curl -X PUT $MODIFY_EFORM_USING_ITEMCODE -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Compile\" : \"Pass\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 				}	
 			}
 		}	
@@ -202,7 +210,7 @@ pipeline
 						sh "mvn clean test"
 
 						echo "update build eform instance with compile and Junit as pass"
-						sh """curl -X PUT $MODIFY_EFORM -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"JUnit\": \"Pass\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+						sh """curl -X PUT $MODIFY_EFORM_USING_ITEMCODE -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"JUnit\": \"Pass\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 
 					}catch(Exception e){
 						
@@ -216,7 +224,7 @@ pipeline
 	                
 	                sh "pip3 install -r digite-devops-resources/parsers/requirements.txt"
 					
-					sh "python3 digite-devops-resources/parsers/junit_parser.py -u '$CREATORLOGINID' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE"
+					sh "python3 digite-devops-resources/parsers/junit_parser.py -u '$CREATORLOGINID' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE -url $ENTP_URL -cbef $CREATE_BULK_EFORM -mef $MODIFY_EFORM"
 					}
 				}	
 			}
@@ -237,7 +245,7 @@ pipeline
 					sh "mvn sonar:sonar -Dsonar.projectKey=$SONAR_PRJ_KEY -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGINID"
 
 					echo "update build eform instance with Code Quality as pass"
-					sh """curl -X PUT $MODIFY_EFORM -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Code Quality\" : \"Pass\"}], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+					sh """curl -X PUT $MODIFY_EFORM_USING_ITEMCODE -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Code Quality\" : \"Pass\"}], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 
 					echo "Call Sonar Parser and updated the results in Unit test Summary"
                     sh "pip3 install -r digite-devops-resources/parsers/requirements.txt"
@@ -262,7 +270,7 @@ pipeline
 					sh "cd target && aws s3 cp SwiftEntp-services-0.0.1-SNAPSHOT.war $ARTEFACT_PATH"
 
 					echo "update build eform instance with artefact values"
-					sh """curl -X PUT $MODIFY_EFORM -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Upload Artifact\" : \"Pass\", \"Artifact location\": \"$ARTIFACT_LOCATION\"}], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""					
+					sh """curl -X PUT $MODIFY_EFORM_USING_ITEMCODE -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Upload Artifact\" : \"Pass\", \"Artifact location\": \"$ARTIFACT_LOCATION\"}], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""					
 				}	
 			}
 		}
@@ -283,7 +291,7 @@ pipeline
 					echo "Build Deployement Completed"
 
 					echo "update build eform Deploy Artifact field as Pass"
-					sh """curl -X PUT $MODIFY_EFORM -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Deploy Artifact\" : \"Pass\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+					sh """curl -X PUT $MODIFY_EFORM_USING_ITEMCODE -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Deploy Artifact\" : \"Pass\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 				}	
 			}
 		}
@@ -307,7 +315,7 @@ pipeline
 						echo "Execute Karate Completed"
 		                                
 						//echo "update build eform instance with karate as Pass"
-						//sh """curl -X PUT $MODIFY_EFORM -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Karate\" : \"Pass\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+						//sh """curl -X PUT $MODIFY_EFORM_USING_ITEMCODE -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Karate\" : \"Pass\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 
 				    }catch(Exception e){
 						
@@ -318,7 +326,7 @@ pipeline
 						echo "Update the results in Karate test Summary"
 			            sh "cd karate/target/surefire-reports && zip -r karateresults.zip . && aws s3 cp karateresults.zip $KARATE_RESULT"
 					    sh "pip3 install -r digite-devops-resources/parsers/requirements.txt"
-					    sh "python3 digite-devops-resources/parsers/karate_parser.py -u '$CREATORLOGINID' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE"
+					    sh "python3 digite-devops-resources/parsers/karate_parser.py -u '$CREATORLOGINID' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE -url $ENTP_URL -cbef $CREATE_BULK_EFORM -mef $MODIFY_EFORM"
             }
          }
 			}
@@ -329,7 +337,7 @@ pipeline
 		success
 		{
 			echo "update build eform Build status field as Pass"
-			sh """curl -X PUT $MODIFY_EFORM -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Build Status\" : \"Pass\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+			sh """curl -X PUT $MODIFY_EFORM_USING_ITEMCODE -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Build Status\" : \"Pass\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 		}
 		failure
 		{
@@ -337,34 +345,34 @@ pipeline
 			{
 				if("$FAILED_STAGE" == "PreRequisite"){
 					echo "update build eform instance with Pre Requisite and Build status fields as Failed"
-					sh """curl -X PUT $MODIFY_EFORM -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Pre Requisite\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""	
+					sh """curl -X PUT $MODIFY_EFORM_USING_ITEMCODE -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Pre Requisite\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""	
 				}
 				else if("$FAILED_STAGE" == "Compile"){
 					echo "update build eform instance with Compile and Build status as Failed"
-					sh """curl -X PUT $MODIFY_EFORM -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Compile\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+					sh """curl -X PUT $MODIFY_EFORM_USING_ITEMCODE -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Compile\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 				}
 				else if("$FAILED_STAGE" == "CodeQuality"){
 					echo "update build eform instance with Code Quality and Build Status as Failed"
-					sh """curl -X PUT $MODIFY_EFORM -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Code Quality\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+					sh """curl -X PUT $MODIFY_EFORM_USING_ITEMCODE -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Code Quality\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 				}
 				else if("$FAILED_STAGE" == "Build"){
 					echo "update build eform instance with Build and Build Status as Failed"
-					sh """curl -X PUT $MODIFY_EFORM -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Upload Artifact\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+					sh """curl -X PUT $MODIFY_EFORM_USING_ITEMCODE -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Upload Artifact\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 				}
 				else if("$FAILED_STAGE" == "Deploy"){
 					echo "update build eform instance with Deploy and Build Status as Failed"
-					sh """curl -X PUT $MODIFY_EFORM -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Deploy Artifact\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+					sh """curl -X PUT $MODIFY_EFORM_USING_ITEMCODE -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Deploy Artifact\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 				}
 				else if("$FAILED_STAGE" == "Karate"){
 					echo "update build eform instance with ExecuteKarate and Build Status as Failed"
-					sh """curl -X PUT $MODIFY_EFORM -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Karate\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+					sh """curl -X PUT $MODIFY_EFORM_USING_ITEMCODE -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Karate\" : \"Failed\", \"Build Status\" : \"Failed\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 				}
 			}	
 		}
 		aborted
 		{
 			echo "update build eform Build status field as Aborted"
-			sh """curl -X PUT $MODIFY_EFORM -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Build Status\" : \"Aborted\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
+			sh """curl -X PUT $MODIFY_EFORM_USING_ITEMCODE -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Build Status\" : \"Aborted\" }], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 		}
 	}
 }
