@@ -19,7 +19,7 @@ build_code = str(ARGS.BUILD_CODE)
 jira_ust_id = str(ARGS.JIRA_UST_ID)
 swift_deployment = "https://ibm.digite.com"
 m_filePath = os.getcwd()
-m_filePath = str(m_filePath).replace("/resources/parsers", "")
+m_filePath = str(m_filePath).replace("/digite-devops-resources/parsers", "")
 m_Dir = m_filePath + os.sep + "target" + os.sep + "surefire-reports"
 files = os.listdir(m_Dir)
 
