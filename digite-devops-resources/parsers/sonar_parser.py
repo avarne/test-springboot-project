@@ -4,7 +4,7 @@ import argparse
 import datetime
 import pytz
 
-timeZ_utc = pytz.timezone('Etc/UTC')
+timeZ_utc = pytz.timezone('Asia/Kolkata')
 
 
 PARSER = argparse.ArgumentParser()
