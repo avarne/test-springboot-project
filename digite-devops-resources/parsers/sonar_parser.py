@@ -103,7 +103,7 @@ def create_bug(auth_token):
     create_eform_endpoint = '/rest/v2/api/EFormService/createEformDataInBulk'
     url = se_url + create_eform_endpoint
     header = {'AuthorizationToken': auth_token}
-    time = datetime.datetime.now().strftime('%d-%b-%Y %H:%M:%S')
+    time = str(datetime.datetime.now(timeZ_utc).strftime('%d-%b-%Y'))+" 00:00:00"
     failure_info = {
         "Name": jira_ust_id + ":" + build_eform_itemcode + ":SonarQubeFailure",
         "Build ID": build_eform_itemcode,
