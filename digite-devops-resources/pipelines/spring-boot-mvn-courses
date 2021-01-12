@@ -57,22 +57,22 @@ pipeline
 					ENTP_URL = props['entp_url']
 					echo "entpurl is $ENTP_URL"
 
-					CREATE_EFORM = "$ENTP_URL"+"props['create_eform']"
+					CREATE_EFORM = "$ENTP_URL"+props['create_eform']
 					echo "Create eform is $CREATE_EFORM"
 
-					MODIFY_EFORM = "$ENTP_URL"+"props['modify_eform']"
+					MODIFY_EFORM = "$ENTP_URL"+props['modify_eform']
 					echo "Modify eform is $MODIFY_EFORM"
 					
 					GITHUB_URL = props['github_url']
 					echo "github url is $GITHUB_URL"
 
-					JUNIT_RESULT = "props['s3_url']"+"props['junit_result']"
+					JUNIT_RESULT = props['s3_url']+props['junit_result']
 					echo "junit result url is $JUNIT_RESULT"
 
-					KARATE_RESULT = "props['s3_url']"+"props['karate_result']"
+					KARATE_RESULT = props['s3_url']+props['karate_result']
 					echo "karate result url is $KARATE_RESULT"
 
-					ARTEFACT_PATH= "props['s3_url']"+"props['artefact_path']"
+					ARTEFACT_PATH= props['s3_url']+props['artefact_path']
 					echo "artefact path url is $ARTEFACT_PATH"
 
 					ARTIFACT_LOCATION = props['artifact_location']
