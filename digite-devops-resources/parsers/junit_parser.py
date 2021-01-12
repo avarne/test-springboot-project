@@ -8,8 +8,11 @@ PARSER = argparse.ArgumentParser()
 PARSER.add_argument("-oc", "--OWNER_CODE", default='IBMC000001INTG')
 PARSER.add_argument("-bi", "--BUILD_CODE", default="BLD833")
 PARSER.add_argument("-u", "--USERNAME", default="azure devops")
+PARSER.add_argument("-url", "--SE_URL", default='https://ibm.digite.com/rest/v2/api/')
 PARSER.add_argument("-auth", "--AUTH_CODE", default="test")
 PARSER.add_argument("-jui", "--JIRA_UST_ID", default="ICP-71")
+PARSER.add_argument("-cbef", "--CREATE_BULK_EFORM", default="EFormService/createEformDataInBulk")
+PARSER.add_argument("-mef", "--MODIFY_EFORM", default="EFormService/modifyEFormItemData")
 ARGS = PARSER.parse_args()
 
 username = str(ARGS.USERNAME)
@@ -17,7 +20,9 @@ owner_code = str(ARGS.OWNER_CODE)
 auth_token = str(ARGS.AUTH_CODE)
 build_code = str(ARGS.BUILD_CODE)
 jira_ust_id = str(ARGS.JIRA_UST_ID)
-swift_deployment = "https://ibm.digite.com"
+swift_deployment = str(ARGS.SE_URL)
+create_eform_endpoint = str(ARGS.CREATE_BULK_EFORM)
+modify_eform_endpoint = str(ARGS.MODIFY_EFORM)
 m_filePath = os.getcwd()
 m_filePath = str(m_filePath).replace("/digite-devops-resources/parsers", "")
 m_Dir = m_filePath + os.sep + "target" + os.sep + "surefire-reports"
@@ -89,7 +94,7 @@ def testcount():
 
 
 def create_work_task(swift_deployment, username, auth_token, owner_code, issue_metadata_list):
-    create_eform_endpoint = '/rest/v2/api/EFormService/createEformDataInBulk'
+    #create_eform_endpoint = 'EFormService/createEformDataInBulk'
     url = swift_deployment + create_eform_endpoint
     header = {'AuthorizationToken': auth_token}
     create_eform_request_body = {
@@ -106,7 +111,7 @@ def create_work_task(swift_deployment, username, auth_token, owner_code, issue_m
 
 
 def push_test_results(total_tests, passed_tests, failed_tests):
-    modify_eform_endpoint = '/rest/v2/api/EFormService/modifyEFormItemData'
+    #modify_eform_endpoint = '/rest/v2/api/EFormService/modifyEFormItemData'
     url = swift_deployment + modify_eform_endpoint
     header = {'AuthorizationToken': auth_token}
     if failed_tests>0:
