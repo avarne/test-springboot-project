@@ -24,7 +24,7 @@ se_url = str(ARGS.SE_URL)
 item_type = str(ARGS.ITEM_TYPE)
 jira_ust_id =str(ARGS.JIRA_UST_ID)
 m_filePath = os.getcwd()
-m_filePath = str(m_filePath).replace("/resources/parsers", "")
+m_filePath = str(m_filePath).replace("/digite-devops-resources/parsers", "")
 m_Dir = m_filePath + os.sep + "karate" + os.sep + "target" + os.sep + "surefire-reports"
 files = os.listdir(m_Dir)
 
