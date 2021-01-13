@@ -62,14 +62,17 @@ pipeline
 					CREATE_EFORM = "$ENTP_URL"+props['create_eform']
 					echo "Create eform is $CREATE_EFORM"
 
-					CREATE_BULK_EFORM = "$ENTP_URL"+props['create_bulk_eform']
+					CREATE_EFORM = "$ENTP_URL"+props['create_eform']
+					echo "Create eform is $CREATE_EFORM"
+
+					CREATE_BULK_EFORM = props['create_bulk_eform']
 					echo "Create bulk eform data is $CREATE_BULK_EFORM"
 
 					MODIFY_EFORM_USING_ITEMCODE = "$ENTP_URL"+props['modify_eform_using_itemcode']
 					echo "Modify Eform Using Itemcode is $MODIFY_EFORM_USING_ITEMCODE"
 
-					MODIFY_EFORM = "$ENTP_URL"+props['modify_eform']
-					echo "Modify eform is $MODIFY_EFORM_USING_ITEMCODE"
+					MODIFY_EFORM = props['modify_eform']
+					echo "Modify eform is $MODIFY_EFORM"
 					
 					GITHUB_URL = props['github_url']
 					echo "github url is $GITHUB_URL"
