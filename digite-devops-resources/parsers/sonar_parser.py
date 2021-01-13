@@ -9,7 +9,7 @@ timeZ_utc = pytz.timezone('Asia/Kolkata')
 
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument("-c", "--PROJ_NAME", default='spring-boot-mvn-courses')
-PARSER.add_argument("-l", "--SE_URL", default='https://ibm.digite.com')
+PARSER.add_argument("-l", "--SE_URL", default='https://ibm.digite.com/rest/v2/api/')
 PARSER.add_argument("-u", "--SE_USERNAME", default='7')
 PARSER.add_argument("-p", "--SE_PWD", default='8')
 PARSER.add_argument("-du", "--SE_DEVOPS_USER", default='admin_IBM')
@@ -18,6 +18,8 @@ PARSER.add_argument("-s", "--SONAR_SERVER_URL", default='https://ibm-sonar.digit
 PARSER.add_argument("-b", "--BUILD_EFORM_ITEMCODE", default='bld18')
 PARSER.add_argument("-oc", "--SE_OWNERCODE", default='IBMC000001INTG')
 PARSER.add_argument("-jui", "--JIRA_UST_ID", default="ICP-71")
+PARSER.add_argument("-cbef", "--CREATE_BULK_EFORM", default="EFormService/createEformDataInBulk")
+PARSER.add_argument("-mef", "--MODIFY_EFORM", default="EFormService/modifyEFormItemData")
 
 # PARSER.add_argument("-t", "--SONAR_TOKEN", default='2')
 ARGS = PARSER.parse_args()
@@ -31,11 +33,13 @@ sonar_server_url = str(ARGS.SONAR_SERVER_URL)
 build_eform_itemcode = str(ARGS.BUILD_EFORM_ITEMCODE)
 se_ownercode = str(ARGS.SE_OWNERCODE)
 jira_ust_id =str(ARGS.JIRA_UST_ID)
+create_eform_endpoint = str(ARGS.CREATE_BULK_EFORM)
+modify_eform_endpoint = str(ARGS.MODIFY_EFORM)
 
 
 def generate_se_login_token():
     # url = f"{se_url}/rest/api/TokenService/getToken"
-    url = se_url + "/rest/api/TokenService/getToken"
+    url = se_url + "TokenService/getToken"
     # data = f"Loginid={se_username}&Password={se_pass}"
     data = "Loginid=" + se_username + "&Password=" + se_pass
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
@@ -81,7 +85,7 @@ def parse_sonar_report(component):
 
 
 def call_se_rest_api(field_json, authToken):
-    url = se_url + "/rest/api/EFormService/modifyEFormItemData"
+    url = se_url + modify_eform_endpoint
     se_field_json = field_json
     se_field_json["Code Smells"] = se_field_json.pop("code_smells", "code_smells")
     se_field_json["Lines Of Code"] = se_field_json.pop("ncloc", "ncloc")
@@ -100,7 +104,7 @@ def call_se_rest_api(field_json, authToken):
     print(resp.text, str(resp.status_code))
 
 def create_bug(auth_token):
-    create_eform_endpoint = '/rest/v2/api/EFormService/createEformDataInBulk'
+    #create_eform_endpoint = '/rest/v2/api/EFormService/createEformDataInBulk'
     url = se_url + create_eform_endpoint
     header = {'AuthorizationToken': auth_token}
     time = datetime.date.today().strftime('%d-%b-%Y %H:%M:%S')
@@ -127,7 +131,7 @@ def create_bug(auth_token):
 
 def get_sonar_threshold(authToken):
 
-    url = se_url + "/rest/v2/api/EFormService/getEFormItemDetails/STD_f/50501/Complexity,Violations,Vulnerabilities,Code Smells,Bugs,Lines Of Code,Code Coverage Percentage"
+    url = se_url + "EFormService/getEFormItemDetails/STD_f/50501/Complexity,Violations,Vulnerabilities,Code Smells,Bugs,Lines Of Code,Code Coverage Percentage"
     headers = {"AuthorizationToken": str(authToken), "accept": "application/json"}
     resp = requests.get(url=url, headers=headers)
     se_data=resp.json()
