@@ -62,9 +62,6 @@ pipeline
 					CREATE_EFORM = "$ENTP_URL"+props['create_eform']
 					echo "Create eform is $CREATE_EFORM"
 
-					CREATE_EFORM = "$ENTP_URL"+props['create_eform']
-					echo "Create eform is $CREATE_EFORM"
-
 					CREATE_BULK_EFORM = props['create_bulk_eform']
 					echo "Create bulk eform data is $CREATE_BULK_EFORM"
 
@@ -252,7 +249,7 @@ pipeline
 
 					echo "Call Sonar Parser and updated the results in Unit test Summary"
                     sh "pip3 install -r digite-devops-resources/parsers/requirements.txt"
-					sh "python3 digite-devops-resources/parsers/sonar_parser.py -t '$AUTH_TOKEN' -b $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE"									
+					sh "python3 digite-devops-resources/parsers/sonar_parser.py -t '$AUTH_TOKEN' -b $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE -url $ENTP_URL -cbef $CREATE_BULK_EFORM -mef $MODIFY_EFORM"									
 				}
 			}	
 		}
