@@ -9,7 +9,7 @@ timeZ_utc = pytz.timezone('Asia/Kolkata')
 
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument("-c", "--PROJ_NAME", default='spring-boot-mvn-courses')
-PARSER.add_argument("-l", "--SE_URL", default='https://ibm.digite.com/rest/v2/api/')
+PARSER.add_argument("-url", "--SE_URL", default='https://ibm.digite.com/rest/v2/api/')
 PARSER.add_argument("-u", "--SE_USERNAME", default='7')
 PARSER.add_argument("-p", "--SE_PWD", default='8')
 PARSER.add_argument("-du", "--SE_DEVOPS_USER", default='admin_IBM')
