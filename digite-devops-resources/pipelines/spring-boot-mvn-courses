@@ -135,7 +135,7 @@ pipeline
                     def ID = "$responseObject.data.ItemCode"
                     println("ID:  $ID")
                     BUILD_EFORMID = ID
-                    println($BUILD_EFORMID)                           
+                    println("$BUILD_EFORMID")                           
 			    
 					echo 'Hello World'
 
