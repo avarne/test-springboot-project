@@ -145,7 +145,7 @@ pipeline
 
 	                def gitauthor = sh(script: 'git log -1 --pretty=format:%an', returnStdout: true)
 	                echo "'$gitauthor'"
-	                Git_COMMIT_AUTHOR = gitauthor
+	                Git_COMMIT_AUTHOR = "$gitauthor"
 	                echo "'$Git_COMMIT_AUTHOR'"
 
 	                Git_COMMIT_DATE = sh(script: "git log -1 --format=format:%cd", returnStdout: true)
