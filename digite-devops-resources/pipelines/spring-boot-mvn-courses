@@ -2,6 +2,7 @@ env.props
 env.GIT_COMMIT_MSG=""
 env.GIT_COMMIT_AUTHOR=""
 env.Git_COMMIT_DATE=""
+env.FAILED_STAGE=""
 env.BUILD_NUMBER=""
 env.GIT_REPO_NAME=""
 env.GIT_DIF=""
@@ -99,8 +100,8 @@ pipeline
 					echo "sonar_loginid is $SONAR_LOGINID"
 
 					echo "$STAGE_NAME"
-					def failedstage=env.STAGE_NAME
-					env.FAILED_STAGE=failedstage
+					def failedstage="$STAGE_NAME"
+					FAILED_STAGE=failedstage
 					echo "StageName is $FAILED_STAGE"
 
 					def buildNumber = currentBuild.number
@@ -183,8 +184,8 @@ pipeline
 				script
 				{
 					echo "$STAGE_NAME"
-					def failedstage=env.STAGE_NAME
-					env.FAILED_STAGE=failedstage
+					def failedstage="$STAGE_NAME"
+					FAILED_STAGE=failedstage
 					echo "StageName is $FAILED_STAGE"
 
 					echo "Compile code"				
@@ -205,8 +206,8 @@ pipeline
 					try
 					{
 						echo "$STAGE_NAME"
-						def failedstage=env.STAGE_NAME
-						env.FAILED_STAGE=failedstage
+						def failedstage="$STAGE_NAME"
+						FAILED_STAGE=failedstage
 						echo "StageName is $FAILED_STAGE"
 
 						echo "execute junit tests"
@@ -240,8 +241,8 @@ pipeline
 				script
 				{
 					echo "$STAGE_NAME"
-					def failedstage=env.STAGE_NAME
-					env.FAILED_STAGE=failedstage
+					def failedstage="$STAGE_NAME"
+					FAILED_STAGE=failedstage
 					echo "StageName is $FAILED_STAGE"
 
 					echo "execute Sonar"
@@ -264,8 +265,8 @@ pipeline
 				script
 				{
 					echo "$STAGE_NAME"
-					def failedstage=env.STAGE_NAME
-					env.FAILED_STAGE=failedstage
+					def failedstage="$STAGE_NAME"
+					FAILED_STAGE=failedstage
 					echo "StageName is $FAILED_STAGE"
 
 					echo "Create Artefact"
@@ -285,8 +286,8 @@ pipeline
 				script
 				{
 					echo "$STAGE_NAME"
-					def failedstage=env.STAGE_NAME
-					env.FAILED_STAGE=failedstage
+					def failedstage="$STAGE_NAME"
+					FAILED_STAGE=failedstage
 					echo "StageName is $FAILED_STAGE"
 					
 					build job: 'deploywar'
@@ -308,8 +309,8 @@ pipeline
 					try
 					{
 		                echo "$STAGE_NAME"
-						def failedstage=env.STAGE_NAME
-						env.FAILED_STAGE=failedstage
+						def failedstage="$STAGE_NAME"
+						FAILED_STAGE=failedstage
 						echo "StageName is $FAILED_STAGE"
 		                                
 		                echo "execute junit tests"
