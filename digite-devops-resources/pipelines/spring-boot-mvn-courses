@@ -1,6 +1,5 @@
 env.props
 env.GIT_COMMIT_MSG=""
-env.GIT_COMMIT_AUTHOR=""
 env.Git_COMMIT_DATE=""
 env.FAILED_STAGE=""
 env.BUILD_NUMBER=""
