@@ -28,7 +28,7 @@ jobs:
         run: |
           echo Triggering jenkins build
           curl -u ibm_user:${{ secrets.JENKINSAPITOKEN }} "https://ibm-jenkins.digite.com/job/TestingPipeline/job/spring-boot-mvn-courses/build?token=junit"
-          curl -u Digite_admin:${{ secrets.DIGITE_ADMIN }} "http://169.60.90.24:8080/job/CasPipeline/job/spring-boot-mvn-courses/build?token=springbootmvn"
+          curl -u Digite_admin:Welcoem@123 "http://169.60.90.24:8080/job/CasPipeline/job/spring-boot-mvn-courses/build?token=springbootmvn"
 
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
