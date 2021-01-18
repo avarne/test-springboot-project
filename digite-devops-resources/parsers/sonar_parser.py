@@ -99,6 +99,7 @@ def call_se_rest_api(field_json, authToken):
              "OwnerCode": se_ownercode,
              "ItemType": "BULD_f",
              "ItemCode": build_eform_itemcode}
+    print(input)         
     headers = {"AuthorizationToken": str(authToken), "Content-Type": "application/json"}
     resp = requests.put(url=url, data=json.dumps(input), headers=headers)
     print(resp.text, str(resp.status_code))
