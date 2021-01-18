@@ -99,7 +99,7 @@ def call_se_rest_api(field_json, authToken):
 #              "OwnerCode": se_ownercode,
 #              "ItemType": "BULD_f",
 #              "ItemCode": build_eform_itemcode}
-      modify_eform_req_body = {
+    modify_eform_req_body = {
         "data":{
         "FieldsData":[se_field_json],
         "OwnerType":"Prj",
