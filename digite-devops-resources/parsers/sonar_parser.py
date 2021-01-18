@@ -85,7 +85,7 @@ def parse_sonar_report(component):
 
 
 def call_se_rest_api(field_json, authToken):
-    url = se_url + modify_eform_endpoint
+    url = 'https://ibm.digite.com/rest/api/' + modify_eform_endpoint
     se_field_json = field_json
     se_field_json["Code Smells"] = se_field_json.pop("code_smells", "code_smells")
     se_field_json["Lines Of Code"] = se_field_json.pop("ncloc", "ncloc")
