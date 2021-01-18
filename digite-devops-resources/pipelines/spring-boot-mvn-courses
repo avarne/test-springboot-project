@@ -289,7 +289,7 @@ pipeline
 					FAILED_STAGE=failedstage
 					echo "StageName is $FAILED_STAGE"
 					
-					build job: 'deploywar'
+					
 
 					echo "Build Deployement Completed"
 
