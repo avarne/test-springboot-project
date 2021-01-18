@@ -85,23 +85,33 @@ def parse_sonar_report(component):
 
 
 def call_se_rest_api(field_json, authToken):
-    url = 'https://ibm.digite.com/rest/api/' + modify_eform_endpoint
+    url = se_url + modify_eform_endpoint
     se_field_json = field_json
     se_field_json["Code Smells"] = se_field_json.pop("code_smells", "code_smells")
     se_field_json["Lines Of Code"] = se_field_json.pop("ncloc", "ncloc")
     se_field_json["Code Coverage Percentage"] = se_field_json.pop("coverage", "coverage")
 
     print(se_field_json)
-    input = {"FieldLabels": ",".join(se_field_json.keys()),
-             "FieldValues": ",".join(se_field_json.values()),
-             "CreatorLoginId": se_devops_user,
-             "OwnerType": "Prj",
-             "OwnerCode": se_ownercode,
-             "ItemType": "BULD_f",
-             "ItemCode": build_eform_itemcode}
-    print(input)         
+#     input = {"FieldLabels": ",".join(se_field_json.keys()),
+#              "FieldValues": ",".join(se_field_json.values()),
+#              "CreatorLoginId": se_devops_user,
+#              "OwnerType": "Prj",
+#              "OwnerCode": se_ownercode,
+#              "ItemType": "BULD_f",
+#              "ItemCode": build_eform_itemcode}
+      modify_eform_req_body = {
+        "data":{
+        "FieldsData":[se_field_json],
+        "OwnerType":"Prj",
+        "OwnerCode":se_ownercode,
+        "ItemType":"BULD_f",
+        "ItemCode":build_eform_itemcode,
+        "CreatorLoginId": se_devops_user
+    }
+    }
     headers = {"AuthorizationToken": str(authToken), "Content-Type": "application/json"}
-    resp = requests.put(url=url, data=json.dumps(input), headers=headers)
+    resp = requests.put(url=url, json=modify_eform_req_body, headers=headers)
+    #json.dumps(input)
     print(resp.text, str(resp.status_code))
 
 def create_bug(auth_token):
