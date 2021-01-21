@@ -87,7 +87,7 @@ pipeline
 					KARATE_RESULT = props['s3_url']+props['karate_result']
 					echo "karate result url is $KARATE_RESULT"
 
-					ARTEFACT_PATH= props['s3_url']+props['artefact_path']
+					ARTEFACT_PATH= props['artefact_path']
 					echo "artefact path is $ARTEFACT_PATH"
 
 					ARTIFACT_LOCATION = props['artifact_location']
