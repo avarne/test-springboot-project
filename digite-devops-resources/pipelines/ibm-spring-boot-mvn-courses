@@ -34,6 +34,10 @@ pipeline
 	{
 		label 'master'
 	}
+	tools
+	{
+	    maven "Maven 3.3.9"
+	}
 	stages
 	{
 		stage('PreRequisite')
@@ -221,13 +225,13 @@ pipeline
 
 					}finally{
 
-					echo "Call Junit Parser and updated the results in Unit test Summary and create defect instance if any junit failures"                        
-	                
-	                sh "cd target/surefire-reports && zip -r junitresults.zip . && aws s3 cp junitresults.zip $JUNIT_RESULT"
-	                
-	                sh "pip3 install -r digite-devops-resources/parsers/requirements.txt"
-					
-					sh "python3 digite-devops-resources/parsers/junit_parser.py -u '$CREATORLOGINID' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE -url $ENTP_URL -cbef $CREATE_BULK_EFORM -mef $MODIFY_EFORM"
+						echo "Call Junit Parser and updated the results in Unit test Summary and create defect instance if any junit failures"                        
+		                
+		                sh "cd target/surefire-reports && zip -r junitresults.zip ."
+		                
+		                sh "pip3 install -r digite-devops-resources/parsers/requirements.txt"
+						
+						sh "python3 digite-devops-resources/parsers/junit_parser.py -u '$CREATORLOGINID' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE -url $ENTP_URL -cbef $CREATE_BULK_EFORM -mef $MODIFY_EFORM"
 					}
 				}	
 			}
@@ -251,7 +255,9 @@ pipeline
 					sh """curl -X PUT $MODIFY_EFORM_USING_ITEMCODE -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Code Quality\" : \"Pass\"}], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""
 
 					echo "Call Sonar Parser and updated the results in Unit test Summary"
+
                     sh "pip3 install -r digite-devops-resources/parsers/requirements.txt"
+
 					sh "python3 digite-devops-resources/parsers/sonar_parser.py -u '$CREATORLOGINID' -t '$AUTH_TOKEN' -b $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE -url $ENTP_URL -cbef $CREATE_BULK_EFORM -mef $MODIFY_EFORM"									
 				}
 			}	
@@ -270,7 +276,7 @@ pipeline
 
 					echo "Create Artefact"
 					sh "mvn clean install || :"
-					sh "cd target && aws s3 cp SwiftEntp-services-0.0.1-SNAPSHOT.war $ARTEFACT_PATH"
+					sh "cd target && cp SwiftEntp-services-0.0.1-SNAPSHOT.war $ARTEFACT_PATH"
 
 					echo "update build eform instance with artefact values"
 					sh """curl -X PUT $MODIFY_EFORM_USING_ITEMCODE -H "accept: application/json" -H "AuthorizationToken: $AUTH_TOKEN" -H "Content-Type: application/json" -d '{\"data\":{ \"FieldsData\":[{ \"Upload Artifact\" : \"Pass\", \"Artifact location\": \"$ARTIFACT_LOCATION\"}], \"CreatorLoginId\":\"$CREATORLOGINID\", \"OwnerType\":\"Prj\", \"OwnerCode\":\"$OWNERCODE\", \"ItemType\":\"$ITEMTYPEBUILD\", \"ItemCode\":\"$BUILD_EFORMID\" }}'"""					
@@ -289,7 +295,9 @@ pipeline
 					FAILED_STAGE=failedstage
 					echo "StageName is $FAILED_STAGE"
 					
-					build job: 'deploywar'
+					echo 'War Deployment started'
+                    sh "pwd && cd /data/artefact/ && cp ENTPservice.war /data/deploy2/ROOT.war"
+					sh "sudo docker restart tomcatalpine"
 
 					echo "Build Deployement Completed"
 
@@ -328,7 +336,7 @@ pipeline
 						
 						echo "Update the results in Karate test Summary"
 
-			            sh "cd karate/target/surefire-reports && zip -r karateresults.zip . && aws s3 cp karateresults.zip $KARATE_RESULT"
+			            sh "cd karate/target/surefire-reports && zip -r karateresults.zip ."
 
 					    sh "pip3 install -r digite-devops-resources/parsers/requirements.txt"
 
