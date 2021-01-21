@@ -46,7 +46,7 @@ pipeline
 			{
 				script
 				{
-					props = readProperties file: 'digite-devops-resources/pipelines/spring-boot-mvn-courses.properties'
+					props = readProperties file: 'digite-devops-resources/pipelines/ibm-spring-boot-mvn-courses.properties'
 					
 					OWNERCODE = props['ownercode']
 					echo "owner code is $OWNERCODE"
