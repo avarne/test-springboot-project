@@ -59,7 +59,7 @@ def xmlparser():
         "Name": jira_ust_id + ":" + build_code + ":KarateFailure",
         "Build ID": build_code,
         "Date Identified": time,
-        "Karate Failures": "Please find below failed TestScripts: \n"+str(testcases),
+        "Karate Failures": "Please find below failed Testcases: \n"+str(testcases),
         "JIRA UST ID": jira_ust_id,
         "Type of Bug": "Karate",
         "Bug Origin": "SE"
