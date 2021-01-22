@@ -52,7 +52,7 @@ def xmlparser():
         "Name": jira_ust_id + ":" + build_code + ":JunitFailure",
         "Build ID": build_code,
         "Date Identified": time,
-        "Junit Failures":"Please find below failed TestScripts: \n"+str(testcases),
+        "Junit Failures":"Please find below failed Testcases: \n"+str(testcases),
         "JIRA UST ID": jira_ust_id,
         "Type of Bug": "JUnit",
         "Bug Origin": "SE"
