@@ -51,7 +51,7 @@ def xmlparser():
 
 def bugitemids():
     bgitemid=[]
-    url = swift_deployment + "EFormService/getEFormItemListWithFilter/Prj/50528/ABUG/ibm_duplicate_junit_bugs/22-Dec-2020 00 00 00"
+    url = swift_deployment + "EFormService/getEFormItemListWithFilter/Prj/50528/ABUG/ibm_duplicate_junit_bugs/22-Dec-2020 00:00:00"
     header = {'AuthorizationToken': auth_token}
     response = requests.get(url, headers=header)
     #print(response)
