@@ -76,7 +76,7 @@ def bugitemids():
 def bugitems():
     bugsitems=[]
     url = se_url + "EFormService/getEFormItemDetails/ABUG/"+bugitemids()+"/Karate Failures"
-    header = {'AuthorizationToken': auth_token}
+    header = {'AuthorizationToken': se_auth_token}
     response = requests.get(url, headers=header)
     bugsitems_data=response.json()
     json_data = bugsitems_data.get("data").get("Items").get("Item")
