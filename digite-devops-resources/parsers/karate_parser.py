@@ -58,7 +58,7 @@ def xmlparser():
 def bugitemids():
     bgitemid=[]
     url = se_url + "EFormService/getEFormItemListWithFilter/Prj/50528/ABUG/ibm_duplicate_karate_bugs/22-Dec-2020 00:00:00"
-    header = {'AuthorizationToken': auth_token}
+    header = {'AuthorizationToken': se_auth_token}
     response = requests.get(url, headers=header)
     #print(response)
     print(response.json())
