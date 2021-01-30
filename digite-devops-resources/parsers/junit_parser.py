@@ -55,9 +55,9 @@ def bugitemids():
     header = {'AuthorizationToken': auth_token}
     response = requests.get(url, headers=header)
     #print(response)
-    #print(response.json())
+    print(response.json())
     bg_data=response.json()
-    json_data = bg_data.get("data").get("Items").get("Item")
+    json_data=bg_data.get("data").get("Items").get("Item")
     print(json_data)
     for item in json_data:
         a=item['ID']
