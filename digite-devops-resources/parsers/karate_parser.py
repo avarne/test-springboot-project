@@ -5,7 +5,6 @@ import datetime
 import requests
 import json
 
-
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument("-oc", "--OWNER_CODE", default='IBMC000001INTG')
 PARSER.add_argument("-bi", "--BUILD_CODE", default="BLD833")
@@ -40,7 +39,6 @@ def myconverter(o):
 
 def xmlparser():
     testcases = []
-    time = datetime.date.today().strftime('%d-%b-%Y %H:%M:%S')
     for filename in files:
         if filename.lower().endswith(".xml"):
             with open(m_Dir + os.sep + filename, "r") as f:
@@ -55,18 +53,50 @@ def xmlparser():
                         if "[1][1]" in name:
                             name = str(name).replace("[1][1]", "")
                         testcases.append(name)
-    failure_info = {
-        "Name": jira_ust_id + ":" + build_code + ":KarateFailure",
-        "Build ID": build_code,
-        "Date Identified": time,
-        "Karate Failures": "Please find below failed Testcases: \n"+str(testcases),
-        "JIRA UST ID": jira_ust_id,
-        "Type of Bug": "Karate",
-        "Bug Origin": "SE"
-    }
-    # print(testcases)
-    return failure_info
+    return testcases
 
+def bugitemids():
+    bgitemid=[]
+    url = swift_deployment + "EFormService/getEFormItemListWithFilter/Prj/50528/ABUG/ibm_duplicate_karate_bugs/22-Dec-2020 00:00:00"
+    header = {'AuthorizationToken': auth_token}
+    response = requests.get(url, headers=header)
+    #print(response)
+    print(response.json())
+    bg_data=response.json()
+    json_data=bg_data.get("data").get("Items").get("Item")
+    print(json_data)
+    for item in json_data:
+        a=item['ID']
+        bgitemid.append(a)
+    print(bgitemid)
+    str1 = ","
+    stritem=(str1.join(bgitemid))
+    return stritem
+
+def bugitems():
+    bugsitems=[]
+    url = swift_deployment + "EFormService/getEFormItemDetails/ABUG/"+bugitemids()+"/Karate Failures"
+    header = {'AuthorizationToken': auth_token}
+    response = requests.get(url, headers=header)
+    bugsitems_data=response.json()
+    json_data = bugsitems_data.get("data").get("Items").get("Item")
+    for item in json_data:
+        a=item.get("LabelInfo").get("Value")
+        bugsitems.append(a)
+    print(bugsitems)
+    return bugsitems
+
+def diff_bugs_testcases():
+    tli1=xmlparser()
+    print("This is tli1"+str(tli1))
+    tli2=bugitems()
+    print("This is tli2" + str(tli2))
+    final_list=[]
+    for t1 in tli1:
+        if t1 not in tli2:
+            final_list.append(t1)
+    print("finaldif lisr is"+str(final_list))
+    return final_list
 
 def testcount():
     testcount = 0
@@ -97,29 +127,38 @@ def testcount():
     count3 = count3 + failurecount
     failed_test_count = count2 + count3
     passed_test_count = count1 - failed_test_count
-    # dict = {'tests': count1, 'errors': count2, 'failures': count3, 'pass': passed_test_count}
-    # print(dict)
     push_test_results(count1, passed_test_count, failed_test_count)
     if failed_test_count > 0:
-        create_work_task(se_url, username, se_auth_token, owner_code, xmlparser())
+        create_work_task(se_url, username, se_auth_token, owner_code, diff_bugs_testcases())
 
 
-def create_work_task(swift_deployment, username, auth_token, owner_code, issue_metadata_list):
+def create_work_task(swift_deployment, username, auth_token, owner_code, testcases):
     #create_eform_endpoint = '/rest/v2/api/EFormService/createEformDataInBulk'
-    url = swift_deployment + create_eform_endpoint
-    header = {'AuthorizationToken': auth_token}
-    create_eform_request_body = {
-        "data": {
-            "FieldsData": [issue_metadata_list],
-            "CreatorLoginId": username,
-            "OwnerType": "Prj",
-            "OwnerCode": owner_code,
-            "ItemType": "ABUG"
+    time = datetime.date.today().strftime('%d-%b-%Y %H:%M:%S')
+    for tcs in testcases:
+        failure_info = {
+            "Name": jira_ust_id + ":" + build_code + ":KarateFailure",
+            "Build ID": build_code,
+            "Date Identified": time,
+            "Karate Failures": str(tcs),
+            "JIRA UST ID": jira_ust_id,
+            "Type of Bug": "Karate",
+            "Bug Origin": "SE"
         }
-    }
-    # print(create_eform_request_body)
-    response = requests.post(url, json=create_eform_request_body, headers=header)
-    print(response.json())
+        url = swift_deployment + create_eform_endpoint
+        header = {'AuthorizationToken': auth_token}
+        create_eform_request_body = {
+            "data": {
+                "FieldsData": [failure_info],
+                "CreatorLoginId": username,
+                "OwnerType": "Prj",
+                "OwnerCode": owner_code,
+                "ItemType": "ABUG"
+            }
+        }
+        # print(create_eform_request_body)
+        response = requests.post(url, json=create_eform_request_body, headers=header)
+        print(response.json())
 
 
 def push_test_results(total_tests, passed_tests, failed_tests):
@@ -128,7 +167,7 @@ def push_test_results(total_tests, passed_tests, failed_tests):
     if failed_tests > 0:
         build_status = "Failed"
         karate_status = "Failed"
-        karateFailures=xmlparser()["Karate Failures"]
+        karateFailures=xmlparser()#["Karate Failures"]
     else:
         build_status = "Pass"
         karate_status = "Pass"
@@ -157,6 +196,5 @@ def push_test_results(total_tests, passed_tests, failed_tests):
     headers = {"AuthorizationToken": str(se_auth_token), "Content-Type": "application/json"}
     resp = requests.put(url=url, json=input_data, headers=headers)
     print(resp.text, str(resp.status_code))
-
 
 testcount()
