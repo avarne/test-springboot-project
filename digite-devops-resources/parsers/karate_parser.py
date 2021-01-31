@@ -61,16 +61,20 @@ def bugitemids():
     header = {'AuthorizationToken': se_auth_token}
     response = requests.get(url, headers=header)
     #print(response)
-    print(response.json())
-    bg_data=response.json()
-    json_data=bg_data.get("data").get("Items").get("Item")
-    print(json_data)
-    for item in json_data:
-        a=item['ID']
-        bgitemid.append(a)
-    print(bgitemid)
-    str1 = ","
-    stritem=(str1.join(bgitemid))
+    try:
+        print(response.json())
+        bg_data=response.json()
+        json_data=bg_data.get("data").get("Items").get("Item")
+        print(json_data)
+        for item in json_data:
+            a=item['ID']
+            bgitemid.append(a)
+        print(bgitemid)
+        str1 = ","
+        stritem=(str1.join(bgitemid))
+    except:
+        print("there are no open bugitemids")
+        stritem=[]    
     return stritem
 
 def bugitems():
@@ -78,12 +82,15 @@ def bugitems():
     url = se_url + "EFormService/getEFormItemDetails/ABUG/"+bugitemids()+"/Karate Failures"
     header = {'AuthorizationToken': se_auth_token}
     response = requests.get(url, headers=header)
-    bugsitems_data=response.json()
-    json_data = bugsitems_data.get("data").get("Items").get("Item")
-    for item in json_data:
-        a=item.get("LabelInfo").get("Value")
-        bugsitems.append(a)
-    print(bugsitems)
+    if response == 400:
+        print("empty bugitems")
+    else:
+        bugsitems_data=response.json()
+        json_data = bugsitems_data.get("data").get("Items").get("Item")
+        for item in json_data:
+            a=item.get("LabelInfo").get("Value")
+            bugsitems.append(a)
+        print(bugsitems)
     return bugsitems
 
 def diff_bugs_testcases():
