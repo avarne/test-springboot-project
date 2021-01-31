@@ -86,7 +86,7 @@ def bugitems():
     response = requests.get(url, headers=header)
     print(response)
     print(type(response))
-    if response = "<Response [400]>":
+    if response == "<Response [400]>":
         print("empty bugitems")
     else:
         bugsitems_data=response.json()
