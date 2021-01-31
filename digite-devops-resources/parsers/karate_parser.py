@@ -84,6 +84,7 @@ def bugitems():
     url = se_url + "EFormService/getEFormItemDetails/ABUG/"+bugitemids()+"/Karate Failures"
     header = {'AuthorizationToken': se_auth_token}
     response = requests.get(url, headers=header)
+    print(response)
     if response == 400:
         print("empty bugitems")
     else:
