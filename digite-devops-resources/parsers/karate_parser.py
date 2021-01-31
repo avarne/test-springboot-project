@@ -74,7 +74,9 @@ def bugitemids():
         stritem=(str1.join(bgitemid))
     except:
         print("there are no open bugitemids")
-        stritem=[]    
+        stritem1=[]
+        stritem=str(stritem1)
+        print(stritem)    
     return stritem
 
 def bugitems():
