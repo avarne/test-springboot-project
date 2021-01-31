@@ -85,8 +85,9 @@ def bugitems():
     header = {'AuthorizationToken': se_auth_token}
     response = requests.get(url, headers=header)
     print(response)
+    a=400
     print(type(response))
-    if response == "<Response [400]>":
+    if a == "400":
         print("empty bugitems")
     else:
         bugsitems_data=response.json()
