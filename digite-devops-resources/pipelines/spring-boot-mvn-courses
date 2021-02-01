@@ -288,8 +288,7 @@ pipeline
 
 					echo "Call Sonar Parser and updated the results in Unit test Summary"
                     sh "pip3 install -r digite-devops-resources/parsers/requirements.txt"
-					sh "python3 digite-devops-resources/parsers/sonar_parser.py -u '$CREATORLOGINID' -t '$AUTH_TOKEN' -b $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE -url $ENTP_URL -cbef $CREATE_BULK_EFORM -mef $MODIFY_EFORM
-					-geilwf $GET_EFORM_IDS_WITH_FILTER -itp $ITEM_TYPE -itid $ITEM_ID -efmtp $EFORM_TYPE -efmfltr $EFORM_SONAR_FILTER -prjdte $PROJECT_START_DATE"									
+					sh "python3 digite-devops-resources/parsers/sonar_parser.py -u '$CREATORLOGINID' -t '$AUTH_TOKEN' -b $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE -url $ENTP_URL -cbef $CREATE_BULK_EFORM -mef $MODIFY_EFORM -geilwf $GET_EFORM_IDS_WITH_FILTER -itp $ITEM_TYPE -itid $ITEM_ID -efmtp $EFORM_TYPE -efmfltr $EFORM_SONAR_FILTER -prjdte $PROJECT_START_DATE"									
 				}
 			}	
 		}
