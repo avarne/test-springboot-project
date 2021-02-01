@@ -84,10 +84,12 @@ def bugitems():
     url = se_url + "EFormService/getEFormItemDetails/ABUG/"+bugitemids()+"/Karate Failures"
     header = {'AuthorizationToken': se_auth_token}
     response = requests.get(url, headers=header)
-    response=str(response)
+    response1=response
+    response1=str(response1)
     print(response)
     print(type(response))
-    if response == "<Response [400]>":
+    print(type(response1))
+    if response1 == "<Response [400]>":
         print("empty bugitems")
     else:
         bugsitems_data=response.json()
