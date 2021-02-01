@@ -90,11 +90,11 @@ def bugitems():
         response = requests.get(url, headers=header)
         print(response)
         bugsitems_data=response.json()
-            json_data = bugsitems_data.get("data").get("Items").get("Item")
-            for item in json_data:
-                a=item.get("LabelInfo").get("Value")
-                bugsitems.append(a)
-            print(bugsitems)
+        json_data = bugsitems_data.get("data").get("Items").get("Item")
+        for item in json_data:
+            a=item.get("LabelInfo").get("Value")
+            bugsitems.append(a)
+        print(bugsitems)
     return bugsitems
 
 def diff_bugs_testcases():
