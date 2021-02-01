@@ -84,10 +84,10 @@ def bugitems():
     url = se_url + "EFormService/getEFormItemDetails/ABUG/"+bugitemids()+"/Karate Failures"
     header = {'AuthorizationToken': se_auth_token}
     response = requests.get(url, headers=header)
+    response=str(response)
     print(response)
-    a=400
     print(type(response))
-    if a == "400":
+    if response == "<Response [400]>":
         print("empty bugitems")
     else:
         bugsitems_data=response.json()
@@ -149,7 +149,7 @@ def create_work_task(swift_deployment, username, auth_token, owner_code, testcas
     time = datetime.date.today().strftime('%d-%b-%Y %H:%M:%S')
     for tcs in testcases:
         failure_info = {
-            "Name": jira_ust_id + ":" + build_code + ":KarateFailure",
+            "Name": jira_ust_id + ":" + build_code + ":" +str(tcs),
             "Build ID": build_code,
             "Date Identified": time,
             "Karate Failures": str(tcs),
