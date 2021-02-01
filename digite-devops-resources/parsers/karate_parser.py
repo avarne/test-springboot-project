@@ -32,9 +32,9 @@ m_Dir = m_filePath + os.sep + "karate" + os.sep + "target" + os.sep + "surefire-
 files = os.listdir(m_Dir)
 
 
-def myconverter(o):
-    if isinstance(o, datetime.datetime):
-        return o.__str__()
+# def myconverter(o):
+#     if isinstance(o, datetime.datetime):
+#         return o.__str__()
 
 
 def xmlparser():
@@ -74,30 +74,27 @@ def bugitemids():
         stritem=(str1.join(bgitemid))
     except:
         print("there are no open bugitemids")
-        stritem1=[]
-        stritem=str(stritem1)
+        stritem=""
         print(stritem)    
     return stritem
 
 def bugitems():
     bugsitems=[]
-    url = se_url + "EFormService/getEFormItemDetails/ABUG/"+bugitemids()+"/Karate Failures"
-    header = {'AuthorizationToken': se_auth_token}
-    response = requests.get(url, headers=header)
-    response1=response
-    response1=str(response1)
-    print(response)
-    print(type(response))
-    print(type(response1))
-    if response1 == "<Response [400]>":
+    bug_item_ids=bugitemids()
+    print(bug_item_ids)
+    if bug_item_ids == "":
         print("empty bugitems")
     else:
+        url = se_url + "EFormService/getEFormItemDetails/ABUG/"+bug_item_ids+"/Karate Failures"
+        header = {'AuthorizationToken': se_auth_token}
+        response = requests.get(url, headers=header)
+        print(response)
         bugsitems_data=response.json()
-        json_data = bugsitems_data.get("data").get("Items").get("Item")
-        for item in json_data:
-            a=item.get("LabelInfo").get("Value")
-            bugsitems.append(a)
-        print(bugsitems)
+            json_data = bugsitems_data.get("data").get("Items").get("Item")
+            for item in json_data:
+                a=item.get("LabelInfo").get("Value")
+                bugsitems.append(a)
+            print(bugsitems)
     return bugsitems
 
 def diff_bugs_testcases():

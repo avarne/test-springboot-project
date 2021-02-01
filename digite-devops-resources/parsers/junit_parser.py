@@ -55,29 +55,40 @@ def bugitemids():
     header = {'AuthorizationToken': auth_token}
     response = requests.get(url, headers=header)
     #print(response)
-    print(response.json())
-    bg_data=response.json()
-    json_data=bg_data.get("data").get("Items").get("Item")
-    print(json_data)
-    for item in json_data:
-        a=item['ID']
-        bgitemid.append(a)
-    print(bgitemid)
-    str1 = ","
-    stritem=(str1.join(bgitemid))
+    try:
+        print(response.json())
+        bg_data=response.json()
+        json_data=bg_data.get("data").get("Items").get("Item")
+        print(json_data)
+        for item in json_data:
+            a=item['ID']
+            bgitemid.append(a)
+        print(bgitemid)
+        str1 = ","
+        stritem=(str1.join(bgitemid))
+    except:
+        print("there are no open bugitemids")
+        stritem=""
+        print(stritem)    
     return stritem
 
 def bugitems():
     bugsitems=[]
-    url = swift_deployment + "EFormService/getEFormItemDetails/ABUG/"+bugitemids()+"/Junit Failures"
-    header = {'AuthorizationToken': auth_token}
-    response = requests.get(url, headers=header)
-    bugsitems_data=response.json()
-    json_data = bugsitems_data.get("data").get("Items").get("Item")
-    for item in json_data:
-        a=item.get("LabelInfo").get("Value")
-        bugsitems.append(a)
-    print(bugsitems)
+    bug_item_ids=bugitemids()
+    print(bug_item_ids)
+    if bug_item_ids == "":
+        print("empty bugitems")
+    else:
+        url = swift_deployment + "EFormService/getEFormItemDetails/ABUG/"+bug_item_ids+"/Junit Failures"
+        header = {'AuthorizationToken': auth_token}
+        response = requests.get(url, headers=header)
+        print(response)
+        bugsitems_data=response.json()
+            json_data = bugsitems_data.get("data").get("Items").get("Item")
+            for item in json_data:
+                a=item.get("LabelInfo").get("Value")
+                bugsitems.append(a)
+            print(bugsitems)
     return bugsitems
 
 def diff_bugs_testcases():
@@ -131,7 +142,7 @@ def create_work_task(swift_deployment, username, auth_token, owner_code, testcas
     time = datetime.date.today().strftime('%d-%b-%Y %H:%M:%S')
     for tcs in testcases:
         failure_info = {
-            "Name": jira_ust_id + ":" + build_code + ":JunitFailure",
+            "Name": jira_ust_id + ":" + build_code + ":" +str(tcs),
             "Build ID": build_code,
             "Date Identified": time,
             "Junit Failures": str(tcs),

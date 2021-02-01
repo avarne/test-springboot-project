@@ -83,6 +83,29 @@ def parse_sonar_report(component):
     # result_df = pd.DataFrame(list(result.items()))
     # result_df.columns = ["Metric", "Value"]
 
+def bugitemids():
+    bgitemid=[]
+    url = se_url + "EFormService/getEFormItemListWithFilter/Prj/50528/ABUG/ibm_duplicate_sonar_bugs/22-Dec-2020 00:00:00"
+    header = {'AuthorizationToken': se_api_token}
+    response = requests.get(url, headers=header)
+    #print(response)
+    try:
+        print(response.json())
+        bg_data=response.json()
+        json_data=bg_data.get("data").get("Items").get("Item")
+        print(json_data)
+        for item in json_data:
+            a=item['ID']
+            bgitemid.append(a)
+        print(bgitemid)
+        str1 = ","
+        stritem=(str1.join(bgitemid))
+    except:
+        print("there are no open bugitemids")
+        stritem=""
+        print(stritem)    
+    return stritem    
+
 
 def call_se_rest_api(field_json, authToken):
     url = se_url + modify_eform_endpoint
@@ -145,6 +168,8 @@ def bug_creation_logic(auth_token):
 
     se_data=get_sonar_threshold(auth_token)
     sonar_data=parse_sonar_report(proj_name)
+    bug_item_ids=bugitemids()
+    print(bug_item_ids)
     for i in (0,6):
         if se_data.get("Label")[i]=="Code Coverage Percentage":
             if se_data.get("Value")[i]<sonar_data["coverage"]:
@@ -154,7 +179,8 @@ def bug_creation_logic(auth_token):
             else:
                 print("coverage : " + sonar_data["coverage"])
                 call_se_rest_api(sonar_data, auth_token)
-                create_bug(auth_token)
+                if bug_item_ids == "":
+                    create_bug(auth_token)
                 exit(1)
 
 auth_token = se_api_token
