@@ -15,6 +15,13 @@ PARSER.add_argument("-ity", "--ITEM_TYPE", default='BULD_f')
 PARSER.add_argument("-jui", "--JIRA_UST_ID", default="ICP-71")
 PARSER.add_argument("-cbef", "--CREATE_BULK_EFORM", default="EFormService/createEformDataInBulk")
 PARSER.add_argument("-mef", "--MODIFY_EFORM", default="EFormService/modifyEFormItemData")
+PARSER.add_argument("-geilwf", "--GET_EFORM_IDS_WITH_FILTER", default="EFormService/getEFormItemListWithFilter")
+PARSER.add_argument("-geid", "--GET_EFORM_DETAILS", default="EFormService/getEFormItemDetails")
+PARSER.add_argument("-itp", "--ITEM_TYPE", default="Prj")
+PARSER.add_argument("-itid", "--ITEM_ID", default="50528")
+PARSER.add_argument("-efmtp", "--EFORM_TYPE", default="ABUG")
+PARSER.add_argument("-efmfltr", "--EFORM_FILTER", default="ibm_duplicate_junit_bugs")
+PARSER.add_argument("-prjdte", "--PROJECT_START_DATE", default="22-Dec-2020 00:00:00")
 ARGS = PARSER.parse_args()
 
 username = str(ARGS.USERNAME)
@@ -26,6 +33,13 @@ item_type = str(ARGS.ITEM_TYPE)
 jira_ust_id =str(ARGS.JIRA_UST_ID)
 create_eform_endpoint = str(ARGS.CREATE_BULK_EFORM)
 modify_eform_endpoint = str(ARGS.MODIFY_EFORM)
+get_eform_ids_with_filter = str(ARGS.GET_EFORM_IDS_WITH_FILTER)
+get_eform_details = str(ARGS.GET_EFORM_DETAILS)
+itm_type = str(ARGS.ITEM_TYPE)
+itm_id = str(ARGS.ITEM_ID)
+efrm_type = str(ARGS.EFORM_TYPE)
+efrm_filter = str(ARGS.EFORM_FILTER)
+proj_strt_date = str(ARGS.PROJECT_START_DATE)
 m_filePath = os.getcwd()
 m_filePath = str(m_filePath).replace("/digite-devops-resources/parsers", "")
 m_Dir = m_filePath + os.sep + "karate" + os.sep + "target" + os.sep + "surefire-reports"
@@ -57,7 +71,8 @@ def xmlparser():
 
 def bugitemids():
     bgitemid=[]
-    url = se_url + "EFormService/getEFormItemListWithFilter/Prj/50528/ABUG/ibm_duplicate_karate_bugs/22-Dec-2020 00:00:00"
+    url = se_url + get_eform_ids_with_filter+"/"+itm_type+"/"+itm_id+"/"+efrm_type+"/"+efrm_filter+"/"+proj_strt_date
+    print(url)
     header = {'AuthorizationToken': se_auth_token}
     response = requests.get(url, headers=header)
     #print(response)
@@ -85,7 +100,7 @@ def bugitems():
     if bug_item_ids == "":
         print("empty bugitems")
     else:
-        url = se_url + "EFormService/getEFormItemDetails/ABUG/"+bug_item_ids+"/Karate Failures"
+        url = se_url + get_eform_details+"/"+efrm_type+"/"+bug_item_ids+"/Karate Failures"
         header = {'AuthorizationToken': se_auth_token}
         response = requests.get(url, headers=header)
         print(response)
