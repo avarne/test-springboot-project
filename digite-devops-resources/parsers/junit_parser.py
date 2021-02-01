@@ -67,7 +67,7 @@ def xmlparser():
 
 def bugitemids():
     bgitemid=[]
-    url = swift_deployment + get_eform_ids_with_filter+"/"+itm_type+"/"+itm_id+"/"+efrm_type+"/"+efrm_filter+"/"+proj_strt_date
+    url = swift_deployment + get_eform_ids_with_filter+"/"+itm_type+"/"+itm_id+"/"+efrm_type+"/"+efrm_filter+"/"+proj_strt_date+ " 00:00:00"
     print(url)
     header = {'AuthorizationToken': auth_token}
     response = requests.get(url, headers=header)
