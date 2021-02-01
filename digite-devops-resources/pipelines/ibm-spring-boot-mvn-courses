@@ -18,6 +18,15 @@ env.CREATE_EFORM=""
 env.CREATE_BULK_EFORM=""
 env.MODIFY_EFORM_USING_ITEMCODE=""
 env.MODIFY_EFORM=""
+env.GET_EFORM_IDS_WITH_FILTER=""
+env.GET_EFORM_DETAILS=""
+env.ITEM_TYPE=""
+env.ITEM_ID=""
+env.EFORM_TYPE=""
+env.EFORM_JUNIT_FILTER=""
+env.EFORM_KARATE_FILTER=""
+env.EFORM_SONAR_FILTER=""
+env.PROJECT_START_DATE=""
 env.GITHUB_URL=""
 env.JUNIT_RESULT=""
 env.KARATE_RESULT=""
@@ -77,6 +86,33 @@ pipeline
 
 					MODIFY_EFORM = props['modify_eform']
 					echo "Modify eform is $MODIFY_EFORM"
+
+					GET_EFORM_IDS_WITH_FILTER = props['get_eform_ids_with_filter']
+					echo "get eform id with filter are $GET_EFORM_IDS_WITH_FILTER"
+
+					GET_EFORM_DETAILS = props['get_eform_details']
+					echo "get eform details are $GET_EFORM_DETAILS"
+
+					ITEM_TYPE = props['itm_type']
+					echo "item type of the project is $ITEM_TYPE"
+
+					ITEM_ID = props['itm_id']
+					echo "item id of the project is $ITEM_ID"
+
+					EFORM_TYPE = props['efrm_type']
+					echo "eform type is $EFORM_TYPE"
+
+					EFORM_JUNIT_FILTER = props['efrm_junit_filter']
+					echo "eform junit filter to apply on bugs eform is $EFORM_JUNIT_FILTER"
+
+					EFORM_KARATE_FILTER = props['efrm_karate_filter']
+					echo "eform karate filter to apply on bugs eform is $EFORM_KARATE_FILTER"
+
+					EFORM_SONAR_FILTER = props['efrm_sonar_filter']
+					echo "eform sonar filter to apply on bugs eform is $EFORM_SONAR_FILTER"
+
+					PROJECT_START_DATE = props['proj_strt_date']
+					echo "projecct start date is $PROJECT_START_DATE"
 					
 					GITHUB_URL = props['github_url']
 					echo "github url is $GITHUB_URL"
@@ -231,7 +267,7 @@ pipeline
 		                
 		                sh "pip3 install -r digite-devops-resources/parsers/requirements.txt"
 						
-						sh "python3 digite-devops-resources/parsers/junit_parser.py -u '$CREATORLOGINID' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE -url $ENTP_URL -cbef $CREATE_BULK_EFORM -mef $MODIFY_EFORM"
+						sh "python3 digite-devops-resources/parsers/junit_parser.py -u '$CREATORLOGINID' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE -url $ENTP_URL -cbef $CREATE_BULK_EFORM -mef $MODIFY_EFORM -bity $ITEMTYPEBUILD -geilwf $GET_EFORM_IDS_WITH_FILTER -geid $GET_EFORM_DETAILS -itp $ITEM_TYPE -itid $ITEM_ID -efmtp $EFORM_TYPE -efmfltr $EFORM_JUNIT_FILTER -prjdte $PROJECT_START_DATE"
 					}
 				}	
 			}
@@ -258,7 +294,7 @@ pipeline
 
                     sh "pip3 install -r digite-devops-resources/parsers/requirements.txt"
 
-					sh "python3 digite-devops-resources/parsers/sonar_parser.py -u '$CREATORLOGINID' -t '$AUTH_TOKEN' -b $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE -url $ENTP_URL -cbef $CREATE_BULK_EFORM -mef $MODIFY_EFORM"									
+					sh "python3 digite-devops-resources/parsers/sonar_parser.py -u '$CREATORLOGINID' -t '$AUTH_TOKEN' -b $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE -url $ENTP_URL -cbef $CREATE_BULK_EFORM -mef $MODIFY_EFORM -bity $ITEMTYPEBUILD -geilwf $GET_EFORM_IDS_WITH_FILTER -itp $ITEM_TYPE -itid $ITEM_ID -efmtp $EFORM_TYPE -efmfltr $EFORM_SONAR_FILTER -prjdte $PROJECT_START_DATE"									
 				}
 			}	
 		}
@@ -343,7 +379,7 @@ pipeline
 
 					    sh "pip3 install -r digite-devops-resources/parsers/requirements.txt"
 
-					    sh "python3 digite-devops-resources/parsers/karate_parser.py -u '$CREATORLOGINID' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE -url $ENTP_URL -cbef $CREATE_BULK_EFORM -mef $MODIFY_EFORM"
+					    sh "python3 digite-devops-resources/parsers/karate_parser.py -u '$CREATORLOGINID' -auth $AUTH_TOKEN -bi $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE -url $ENTP_URL -cbef $CREATE_BULK_EFORM -mef $MODIFY_EFORM -bity $ITEMTYPEBUILD -geilwf $GET_EFORM_IDS_WITH_FILTER -geid $GET_EFORM_DETAILS -itp $ITEM_TYPE -itid $ITEM_ID -efmtp $EFORM_TYPE -efmfltr $EFORM_KARATE_FILTER -prjdte $PROJECT_START_DATE"
             		}
          		}
 			}
