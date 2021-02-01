@@ -9,6 +9,7 @@ PARSER.add_argument("-oc", "--OWNER_CODE", default='IBMC000001INTG')
 PARSER.add_argument("-bi", "--BUILD_CODE", default="BD833")
 PARSER.add_argument("-u", "--USERNAME", default="azure devops")
 PARSER.add_argument("-url", "--SE_URL", default='https://ibm.digite.com/rest/v2/api/')
+PARSER.add_argument("-bity", "--BUILD_ITEM_TYPE", default='BULD_f')
 PARSER.add_argument("-auth", "--AUTH_CODE", default="test")
 PARSER.add_argument("-jui", "--JIRA_UST_ID", default="ICP-71")
 PARSER.add_argument("-cbef", "--CREATE_BULK_EFORM", default="EFormService/createEformDataInBulk")
@@ -26,6 +27,7 @@ username = str(ARGS.USERNAME)
 owner_code = str(ARGS.OWNER_CODE)
 auth_token = str(ARGS.AUTH_CODE)
 build_code = str(ARGS.BUILD_CODE)
+item_type = str(ARGS.BUILD_ITEM_TYPE)
 jira_ust_id = str(ARGS.JIRA_UST_ID)
 swift_deployment = str(ARGS.SE_URL)
 create_eform_endpoint = str(ARGS.CREATE_BULK_EFORM)
@@ -205,7 +207,7 @@ def push_test_results(total_tests, passed_tests, failed_tests):
         "FieldsData":[Data],
         "OwnerType":"Prj",
         "OwnerCode":owner_code,
-        "ItemType":"BULD_f",
+        "ItemType":item_type,
         "ItemCode":build_code,
         "CreatorLoginId": username
     }
