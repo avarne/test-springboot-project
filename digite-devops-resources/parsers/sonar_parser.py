@@ -99,7 +99,7 @@ def parse_sonar_report(component):
 
 def bugitemids():
     bgitemid=[]
-    url = se_url + get_eform_ids_with_filter+"/"+itm_type+"/"+itm_id+"/"+efrm_type+"/"+efrm_filter+"/"+proj_strt_date+" 00:00:00"
+    url = se_url + get_eform_ids_with_filter+"/"+itm_type+"/"+itm_id+"/"+efrm_type+"/"+efrm_filter+"/"+proj_strt_date+" 12:16:00"
     print(url)
     header = {'AuthorizationToken': se_api_token}
     response = requests.get(url, headers=header)
