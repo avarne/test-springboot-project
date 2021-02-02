@@ -67,7 +67,7 @@ def xmlparser():
 
 def bugitemids():
     bgitemid=[]
-    url = swift_deployment + get_eform_ids_with_filter+"/"+itm_type+"/"+itm_id+"/"+efrm_type+"/"+efrm_filter+"/"+proj_strt_date+ " 12:16:00"
+    url = swift_deployment + get_eform_ids_with_filter+"/"+itm_type+"/"+itm_id+"/"+efrm_type+"/"+efrm_filter+"/"+proj_strt_date+ " 15:00:00"
     print(url)
     header = {'AuthorizationToken': auth_token}
     response = requests.get(url, headers=header)
@@ -191,7 +191,7 @@ def push_test_results(total_tests, passed_tests, failed_tests):
         JunitJaCoCo="Failed"
         JunitFailures=xmlparser()#["Junit Failures"]
     else:
-        BuildStatus="Pass"
+        BuildStatus="In Progress"
         JunitJaCoCo="Pass"
         JunitFailures = ""
     Data={"Type Of Unit Test":"JUnit",
