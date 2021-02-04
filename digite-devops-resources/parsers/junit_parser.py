@@ -50,6 +50,9 @@ files = os.listdir(m_Dir)
 #         return o.__str__()
 
 def xmlparser():
+    """
+    This function will retrurn a list of failed test case names in the current run.
+    """
     testcases = []
     for filename in files:
         if filename.lower().endswith(".xml"):
@@ -66,6 +69,9 @@ def xmlparser():
     return testcases
 
 def bugitemids():
+    """
+    This function will return a list of open bug eform item id's that are there in Swift ENTP application, these id's list is used to find the testcase names.
+    """
     bgitemid=[]
     url = swift_deployment + get_eform_ids_with_filter+"/"+itm_type+"/"+itm_id+"/"+efrm_type+"/"+efrm_filter+"/"+proj_strt_date+ " 15:00:00"
     print(url)
@@ -90,6 +96,9 @@ def bugitemids():
     return stritem
 
 def bugitems():
+    """
+    This function will return a list of testcases which are already logged in the bug eform.
+    """
     bugsitems=[]
     bug_item_ids=bugitemids()
     print(bug_item_ids)
@@ -109,6 +118,9 @@ def bugitems():
     return bugsitems
 
 def diff_bugs_testcases():
+    """
+    This fucntion will return the list of difference between the list of current run failures and list of already logged bugs in Swift ENTP.
+    """
     tli1=xmlparser()
     print("This is tli1"+str(tli1))
     tli2=bugitems()
@@ -121,6 +133,9 @@ def diff_bugs_testcases():
     return final_list
 
 def testcount():
+    """
+    This fucntion will verify the count of the current failures, if the count is more than zero it will create a bug and update the results in build eform in Swift ENTP, if not it will just update the result in build eform.
+    """
     testcount = 0
     errorcount = 0
     failurecount = 0
@@ -155,6 +170,9 @@ def testcount():
 
 
 def create_work_task(swift_deployment, username, auth_token, owner_code, testcases):
+    """
+    This fucntion will create a bug eform instance, if the current failure count is more than zero and there is no bug already created for the failed testcase.
+    """
     #create_eform_endpoint = 'EFormService/createEformDataInBulk'
     time = datetime.date.today().strftime('%d-%b-%Y %H:%M:%S')
     for tcs in testcases:
@@ -183,6 +201,9 @@ def create_work_task(swift_deployment, username, auth_token, owner_code, testcas
 
 
 def push_test_results(total_tests, passed_tests, failed_tests):
+    """
+    This function will update the test results in build eform.
+    """
     #modify_eform_endpoint = '/rest/v2/api/EFormService/modifyEFormItemData'
     url = swift_deployment + modify_eform_endpoint
     header = {'AuthorizationToken': auth_token}

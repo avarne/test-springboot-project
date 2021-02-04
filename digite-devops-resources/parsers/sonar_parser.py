@@ -52,6 +52,9 @@ proj_strt_date = str(ARGS.PROJECT_START_DATE)
 
 
 def generate_se_login_token():
+    """
+    This fucntion returns the token of Swift ENTP.
+    """
     # url = f"{se_url}/rest/api/TokenService/getToken"
     url = se_url + "TokenService/getToken"
     # data = f"Loginid={se_username}&Password={se_pass}"
@@ -65,6 +68,9 @@ def generate_se_login_token():
 
 
 def parse_sonar_report(component):
+    """
+    This fucntion will parse the sonar result and return the dict of the result
+    """
     # auth = HTTPBasicAuth(sonarQube_user, sonarQube_pass)
 
     genrequest = {
@@ -98,6 +104,9 @@ def parse_sonar_report(component):
     # result_df.columns = ["Metric", "Value"]
 
 def bugitemids():
+    """
+    This function will return a list of open bug eform item id's that are there in Swift ENTP application, these id's list is used to find the testcase names.
+    """
     bgitemid=[]
     url = se_url + get_eform_ids_with_filter+"/"+itm_type+"/"+itm_id+"/"+efrm_type+"/"+efrm_filter+"/"+proj_strt_date+" 15:00:00"
     print(url)
@@ -123,6 +132,9 @@ def bugitemids():
 
 
 def call_se_rest_api(field_json, authToken):
+    """
+    This fucntion will update the result in build eform
+    """
     url = se_url + modify_eform_endpoint
     se_field_json = field_json
     se_field_json["Code Smells"] = se_field_json.pop("code_smells", "code_smells")
@@ -144,6 +156,9 @@ def call_se_rest_api(field_json, authToken):
     print(resp.text, str(resp.status_code))
 
 def create_bug(auth_token):
+    """
+    This function will create a bug in Swift ENTP when the current run coverage is less than the threshold defined.
+    """
     #create_eform_endpoint = '/rest/v2/api/EFormService/createEformDataInBulk'
     url = se_url + create_eform_endpoint
     header = {'AuthorizationToken': auth_token}
@@ -170,7 +185,9 @@ def create_bug(auth_token):
     print(response.json())
 
 def get_sonar_threshold(authToken):
-
+    """
+    This function will get the threshold value of codecoverage defined in Swift ENTP
+    """
     url = se_url + "EFormService/getEFormItemDetails/STD_f/50501/Complexity,Violations,Vulnerabilities,Code Smells,Bugs,Lines Of Code,Code Coverage Percentage"
     headers = {"AuthorizationToken": str(authToken), "accept": "application/json"}
     resp = requests.get(url=url, headers=headers)
@@ -180,7 +197,9 @@ def get_sonar_threshold(authToken):
     return(json_data)
 
 def bug_creation_logic(auth_token):
-
+    """
+    This fucntion will verify the threshold value of current run and the value given in Swit ENTP, if the threshold is not met and there is no bug logged in Swift NETP this function will create a new bug.
+    """
     se_data=get_sonar_threshold(auth_token)
     sonar_data=parse_sonar_report(proj_name)
     bug_item_ids=bugitemids()
