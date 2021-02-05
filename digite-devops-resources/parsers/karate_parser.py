@@ -5,6 +5,7 @@ import datetime
 import requests
 import json
 
+
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument("-oc", "--OWNER_CODE", default='IBMC000001INTG')
 PARSER.add_argument("-bi", "--BUILD_CODE", default="BD833")
@@ -15,13 +16,6 @@ PARSER.add_argument("-bity", "--BUILD_ITEM_TYPE", default='BULD_f')
 PARSER.add_argument("-jui", "--JIRA_UST_ID", default="ICP-71")
 PARSER.add_argument("-cbef", "--CREATE_BULK_EFORM", default="EFormService/createEformDataInBulk")
 PARSER.add_argument("-mef", "--MODIFY_EFORM", default="EFormService/modifyEFormItemData")
-PARSER.add_argument("-geilwf", "--GET_EFORM_IDS_WITH_FILTER", default="EFormService/getEFormItemListWithFilter")
-PARSER.add_argument("-geid", "--GET_EFORM_DETAILS", default="EFormService/getEFormItemDetails")
-PARSER.add_argument("-itp", "--ITEM_TYPE", default="Prj")
-PARSER.add_argument("-itid", "--ITEM_ID", default="50528")
-PARSER.add_argument("-efmtp", "--EFORM_TYPE", default="ABUG")
-PARSER.add_argument("-efmfltr", "--EFORM_FILTER", default="ibm_duplicate_junit_bugs")
-PARSER.add_argument("-prjdte", "--PROJECT_START_DATE", default="22-Dec-2020 00:00:00")
 ARGS = PARSER.parse_args()
 
 username = str(ARGS.USERNAME)
@@ -33,13 +27,6 @@ item_type = str(ARGS.BUILD_ITEM_TYPE)
 jira_ust_id =str(ARGS.JIRA_UST_ID)
 create_eform_endpoint = str(ARGS.CREATE_BULK_EFORM)
 modify_eform_endpoint = str(ARGS.MODIFY_EFORM)
-get_eform_ids_with_filter = str(ARGS.GET_EFORM_IDS_WITH_FILTER)
-get_eform_details = str(ARGS.GET_EFORM_DETAILS)
-itm_type = str(ARGS.ITEM_TYPE)
-itm_id = str(ARGS.ITEM_ID)
-efrm_type = str(ARGS.EFORM_TYPE)
-efrm_filter = str(ARGS.EFORM_FILTER)
-proj_strt_date = str(ARGS.PROJECT_START_DATE)
 m_filePath = os.getcwd()
 m_filePath = str(m_filePath).replace("/digite-devops-resources/parsers", "")
 m_Dir = m_filePath + os.sep + "karate" + os.sep + "target" + os.sep + "surefire-reports"
@@ -52,10 +39,8 @@ files = os.listdir(m_Dir)
 
 
 def xmlparser():
-    """
-    This function will retrurn a list of failed test case names in the current run.
-    """
     testcases = []
+    time = datetime.date.today().strftime('%d-%b-%Y %H:%M:%S')
     for filename in files:
         if filename.lower().endswith(".xml"):
             with open(m_Dir + os.sep + filename, "r") as f:
@@ -70,76 +55,20 @@ def xmlparser():
                         if "[1][1]" in name:
                             name = str(name).replace("[1][1]", "")
                         testcases.append(name)
-    return testcases
+    failure_info = {
+        "Name": jira_ust_id + ":" + build_code + ":KarateFailure",
+        "Build ID": build_code,
+        "Date Identified": time,
+        "Karate Failures": "Please find below failed Testcases: \n"+str(testcases),
+        "JIRA UST ID": jira_ust_id,
+        "Type of Bug": "Karate",
+        "Bug Origin": "SE"
+    }
+    # print(testcases)
+    return failure_info
 
-def bugitemids():
-    """
-    This function will return a list of open bug eform item id's that are there in Swift ENTP application, these id's list is used to find the testcase names.
-    """
-    bgitemid=[]
-    url = se_url + get_eform_ids_with_filter+"/"+itm_type+"/"+itm_id+"/"+efrm_type+"/"+efrm_filter+"/"+proj_strt_date+" 15:00:00"
-    print(url)
-    header = {'AuthorizationToken': se_auth_token}
-    response = requests.get(url, headers=header)
-    #print(response)
-    try:
-        print(response.json())
-        bg_data=response.json()
-        json_data=bg_data.get("data").get("Items").get("Item")
-        print(json_data)
-        for item in json_data:
-            a=item['ID']
-            bgitemid.append(a)
-        print(bgitemid)
-        str1 = ","
-        stritem=(str1.join(bgitemid))
-    except:
-        print("there are no open bugitemids")
-        stritem=""
-        print(stritem)    
-    return stritem
-
-def bugitems():
-    """
-    This function will return a list of testcases which are already logged in the bug eform.
-    """
-    bugsitems=[]
-    bug_item_ids=bugitemids()
-    print(bug_item_ids)
-    if bug_item_ids == "":
-        print("empty bugitems")
-    else:
-        url = se_url + get_eform_details+"/"+efrm_type+"/"+bug_item_ids+"/Karate Failures"
-        header = {'AuthorizationToken': se_auth_token}
-        response = requests.get(url, headers=header)
-        print(response)
-        bugsitems_data=response.json()
-        json_data = bugsitems_data.get("data").get("Items").get("Item")
-        for item in json_data:
-            a=item.get("LabelInfo").get("Value")
-            bugsitems.append(a)
-        print(bugsitems)
-    return bugsitems
-
-def diff_bugs_testcases():
-    """
-    This fucntion will return the list of difference between the list of current run failures and list of already logged bugs in Swift ENTP.
-    """
-    tli1=xmlparser()
-    print("This is tli1"+str(tli1))
-    tli2=bugitems()
-    print("This is tli2" + str(tli2))
-    final_list=[]
-    for t1 in tli1:
-        if t1 not in tli2:
-            final_list.append(t1)
-    print("finaldif lisr is"+str(final_list))
-    return final_list
 
 def testcount():
-    """
-    This fucntion will verify the count of the current failures, if the count is more than zero it will create a bug and update the results in build eform in Swift ENTP, if not it will just update the result in build eform.
-    """
     testcount = 0
     errorcount = 0
     failurecount = 0
@@ -168,53 +97,38 @@ def testcount():
     count3 = count3 + failurecount
     failed_test_count = count2 + count3
     passed_test_count = count1 - failed_test_count
+    # dict = {'tests': count1, 'errors': count2, 'failures': count3, 'pass': passed_test_count}
+    # print(dict)
     push_test_results(count1, passed_test_count, failed_test_count)
     if failed_test_count > 0:
-        create_work_task(se_url, username, se_auth_token, owner_code, diff_bugs_testcases())
+        create_work_task(se_url, username, se_auth_token, owner_code, xmlparser())
 
 
-def create_work_task(swift_deployment, username, auth_token, owner_code, testcases):
-    """
-    This fucntion will create a bug eform instance, if the current failure count is more than zero and there is no bug already created for the failed testcase.
-    """
+def create_work_task(swift_deployment, username, auth_token, owner_code, issue_metadata_list):
     #create_eform_endpoint = '/rest/v2/api/EFormService/createEformDataInBulk'
-    time = datetime.date.today().strftime('%d-%b-%Y %H:%M:%S')
-    for tcs in testcases:
-        failure_info = {
-            "Name": jira_ust_id + ":" + build_code + ":" +str(tcs),
-            "Build ID": build_code,
-            "Date Identified": time,
-            "Karate Failures": str(tcs),
-            "JIRA UST ID": jira_ust_id,
-            "Type of Bug": "Karate",
-            "Bug Origin": "SE"
+    url = swift_deployment + create_eform_endpoint
+    header = {'AuthorizationToken': auth_token}
+    create_eform_request_body = {
+        "data": {
+            "FieldsData": [issue_metadata_list],
+            "CreatorLoginId": username,
+            "OwnerType": "Prj",
+            "OwnerCode": owner_code,
+            "ItemType": "ABUG"
         }
-        url = swift_deployment + create_eform_endpoint
-        header = {'AuthorizationToken': auth_token}
-        create_eform_request_body = {
-            "data": {
-                "FieldsData": [failure_info],
-                "CreatorLoginId": username,
-                "OwnerType": "Prj",
-                "OwnerCode": owner_code,
-                "ItemType": "ABUG"
-            }
-        }
-        # print(create_eform_request_body)
-        response = requests.post(url, json=create_eform_request_body, headers=header)
-        print(response.json())
+    }
+    # print(create_eform_request_body)
+    response = requests.post(url, json=create_eform_request_body, headers=header)
+    print(response.json())
 
 
 def push_test_results(total_tests, passed_tests, failed_tests):
-    """
-    This function will update the test results in build eform.
-    """
     url = se_url+modify_eform_endpoint
     print(url)
     if failed_tests > 0:
         build_status = "Failed"
         karate_status = "Failed"
-        karateFailures=xmlparser()#["Karate Failures"]
+        karateFailures=xmlparser()["Karate Failures"]
     else:
         build_status = "In Progress"
         karate_status = "Pass"
@@ -243,5 +157,6 @@ def push_test_results(total_tests, passed_tests, failed_tests):
     headers = {"AuthorizationToken": str(se_auth_token), "Content-Type": "application/json"}
     resp = requests.put(url=url, json=input_data, headers=headers)
     print(resp.text, str(resp.status_code))
+
 
 testcount()
