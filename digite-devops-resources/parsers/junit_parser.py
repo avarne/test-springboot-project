@@ -121,7 +121,7 @@ def push_test_results(total_tests, passed_tests, failed_tests):
         JunitJaCoCo="Failed"
         JunitFailures=xmlparser()["Junit Failures"]
     else:
-        BuildStatus="Pass"
+        BuildStatus="In Progress"
         JunitJaCoCo="Pass"
         JunitFailures = ""
     Data={"Type Of Unit Test":"JUnit",

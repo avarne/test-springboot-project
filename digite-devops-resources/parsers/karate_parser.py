@@ -130,7 +130,7 @@ def push_test_results(total_tests, passed_tests, failed_tests):
         karate_status = "Failed"
         karateFailures=xmlparser()["Karate Failures"]
     else:
-        build_status = "Pass"
+        build_status = "In Progress"
         karate_status = "Pass"
         karateFailures=""
     fields_data = {
