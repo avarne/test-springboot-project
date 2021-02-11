@@ -135,7 +135,7 @@ def create_bug(auth_token):
 
 def get_sonar_threshold(authToken):
 
-    url = se_url + "EFormService/getEFormItemDetails/STD_f/50501/Complexity,Violations,Vulnerabilities,Code Smells,Bugs,Lines Of Code,Code Coverage Percentage"
+    url = se_url + "EFormService/getEFormItemDetails/STD_f/50502/Complexity,Violations,Vulnerabilities,Code Smells,Bugs,Lines Of Code,Code Coverage Percentage"
     headers = {"AuthorizationToken": str(authToken), "accept": "application/json"}
     resp = requests.get(url=url, headers=headers)
     se_data=resp.json()
