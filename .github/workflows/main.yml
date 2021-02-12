@@ -24,10 +24,10 @@ jobs:
       - uses: actions/checkout@v2
 
       # Runs a single command using the runners shell
+      #curl -u ibm_user:${{ secrets.JENKINSAPITOKEN }} "https://ibm-jenkins.digite.com/job/TestingPipeline/job/spring-boot-mvn-courses/build?token=junit"
       - name: Run a one-line script
         run: |
           echo Triggering jenkins build
-          curl -u ibm_user:${{ secrets.JENKINSAPITOKEN }} "https://ibm-jenkins.digite.com/job/TestingPipeline/job/spring-boot-mvn-courses/build?token=junit"
           curl -u Digite_admin:${{ secrets.DIGITE_ADMIN }} "http://169.60.90.24:8080/job/CasPipeline/job/spring-boot-mvn-courses/build?token=springbootmvn"
 
       # Runs a set of commands using the runners shell
