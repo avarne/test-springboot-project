@@ -26,6 +26,7 @@ env.ARTIFACT_LOCATION=""
 env.SONAR_PRJ_KEY=""
 env.SONAR_URL=""
 env.SONAR_LOGINID=""
+env.SONAR_THRESHOLD_EFORM_ID=""
 
 
 pipeline
@@ -101,6 +102,9 @@ pipeline
 
 					SONAR_LOGINID = props['sonar_loginid']
 					echo "sonar_loginid is $SONAR_LOGINID"
+
+					SONAR_THRESHOLD_EFORM_ID = props['sonar_threshold_eform_id']
+					echo "sonar_threshold_eform_id is $SONAR_THRESHOLD_EFORM_ID"
 
 					echo "$STAGE_NAME"
 					def failedstage="$STAGE_NAME"
@@ -258,7 +262,7 @@ pipeline
 
                     sh "pip3 install -r digite-devops-resources/parsers/requirements.txt"
 
-					sh "python3 digite-devops-resources/parsers/sonar_parser.py -u '$CREATORLOGINID' -t '$AUTH_TOKEN' -b $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE -url $ENTP_URL -cbef $CREATE_BULK_EFORM -mef $MODIFY_EFORM -bity $ITEMTYPEBUILD"									
+					sh "python3 digite-devops-resources/parsers/sonar_parser.py -u '$CREATORLOGINID' -t '$AUTH_TOKEN' -b $BUILD_EFORMID -oc $OWNERCODE -jui $ITEM_CODE -url $ENTP_URL -cbef $CREATE_BULK_EFORM -mef $MODIFY_EFORM -bity $ITEMTYPEBUILD -stid $SONAR_THRESHOLD_EFORM_ID"
 				}
 			}	
 		}

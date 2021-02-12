@@ -16,6 +16,7 @@ PARSER.add_argument("-u", "--SE_DEVOPS_USER", default='admin_IBM')
 PARSER.add_argument("-bity", "--BUILD_ITEM_TYPE", default='BULD_f')
 PARSER.add_argument("-t", "--SE_API_TOKEN", default='gfgdfgdtrtrdtd')
 PARSER.add_argument("-s", "--SONAR_SERVER_URL", default='https://ibm-sonar.digite.com/')
+PARSER.add_argument("-stid", "--SONAR_THRESHOLD_EFORM_ID", default='50501')
 PARSER.add_argument("-b", "--BUILD_EFORM_ITEMCODE", default='bd18')
 PARSER.add_argument("-oc", "--SE_OWNERCODE", default='IBMC000001INTG')
 PARSER.add_argument("-jui", "--JIRA_UST_ID", default="ICP-71")
@@ -31,6 +32,7 @@ se_pass = str(ARGS.SE_PWD)
 se_devops_user = str(ARGS.SE_DEVOPS_USER)
 se_api_token = str(ARGS.SE_API_TOKEN)
 sonar_server_url = str(ARGS.SONAR_SERVER_URL)
+sonar_threshold_eform_id = str(ARGS.SONAR_THRESHOLD_EFORM_ID)
 build_eform_itemcode = str(ARGS.BUILD_EFORM_ITEMCODE)
 item_type = str(ARGS.BUILD_ITEM_TYPE)
 se_ownercode = str(ARGS.SE_OWNERCODE)
@@ -135,7 +137,7 @@ def create_bug(auth_token):
 
 def get_sonar_threshold(authToken):
 
-    url = se_url + "EFormService/getEFormItemDetails/STD_f/50502/Complexity,Violations,Vulnerabilities,Code Smells,Bugs,Lines Of Code,Code Coverage Percentage"
+    url = se_url + "EFormService/getEFormItemDetails/STD_f/" + sonar_threshold_eform_id + "/Complexity,Violations,Vulnerabilities,Code Smells,Bugs,Lines Of Code,Code Coverage Percentage"
     headers = {"AuthorizationToken": str(authToken), "accept": "application/json"}
     resp = requests.get(url=url, headers=headers)
     se_data=resp.json()
