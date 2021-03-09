@@ -325,7 +325,8 @@ pipeline
 						echo "StageName is $FAILED_STAGE"
 
 						echo "set the url for karte execution"
-						sh "cd karate/src/test/java && sed -i 's/karate_url/wdcdmzyz22032076.ibmcloud.dst.ibm.com:8081/g' karate-config.js"
+						//sh "cd karate/src/test/java && sed -i 's/karate_url/wdcdmzyz22032076.ibmcloud.dst.ibm.com:8081/g' karate-config.js"
+						sh "cd karate/src/test/java && sed -i 's/karate_url/localhost:8081/g' karate-config.js"
 		                                
 		                echo "execute Karate tests"
 						sh "cd karate && mvn clean test"
