@@ -34,11 +34,11 @@ public class StudentControllerTest {
 	@MockBean
 	private StudentService studentService;
 
-	Course mockCourse = new Course("Course1", "Springboot", "10 Steps",
+	Course mockCourse = new Course("Course1", "Spring", "10 Steps",
 			Arrays.asList("Learn Maven", "Import Project", "First Example",
 					"Second Example"));
 
-	String exampleCourseJson = "{\"name\":\"Springboot\",\"description\":\"10 Steps\",\"steps\":[\"Learn Maven\",\"Import Project\",\"First Example\",\"Second Example\"]}";
+	String exampleCourseJson = "{\"name\":\"Spring\",\"description\":\"10 Steps\",\"steps\":[\"Learn Maven\",\"Import Project\",\"First Example\",\"Second Example\"]}";
 
 	@Test
 	public void retrieveDetailsForCourse() throws Exception {
