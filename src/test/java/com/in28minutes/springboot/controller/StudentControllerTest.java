@@ -34,11 +34,11 @@ public class StudentControllerTest {
 	@MockBean
 	private StudentService studentService;
 
-	Course mockCourse = new Course("Course1", "SpringBoot", "10 Steps",
+	Course mockCourse = new Course("Course1", "Springboot", "10 Steps",
 			Arrays.asList("Learn Maven", "Import Project", "First Example",
 					"Second Example"));
 
-	String exampleCourseJson = "{\"name\":\"SpringBoot\",\"description\":\"10 Steps\",\"steps\":[\"Learn Maven\",\"Import Project\",\"First Example\",\"Second Example\"]}";
+	String exampleCourseJson = "{\"name\":\"Springboot\",\"description\":\"10 Steps\",\"steps\":[\"Learn Maven\",\"Import Project\",\"First Example\",\"Second Example\"]}";
 
 	@Test
 	public void retrieveDetailsForCourse() throws Exception {
@@ -55,7 +55,7 @@ public class StudentControllerTest {
 
 		System.out.println(result.getResponse());
 		//String expected = "{id:Course1,name:Spring,description:10 Steps}";
-		String expected = "{id:Course1,name:SpringBoot,description:'10 Steps'}";
+		String expected = "{id:Course1,name:Springboot,description:'10 Steps'}";
 
 		// {"id":"Course1","name":"Spring","description":"10 Steps, 25 Examples and 10K Students","steps":["Learn Maven","Import Project","First Example","Second Example"]}
 
