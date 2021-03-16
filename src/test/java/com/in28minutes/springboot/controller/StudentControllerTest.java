@@ -55,7 +55,7 @@ public class StudentControllerTest {
 
 		System.out.println(result.getResponse());
 		//String expected = "{id:Course1,name:Spring,description:10 Steps}";
-		String expected = "{id:Course1,name:Spring,description:'10 Steps'}";
+		String expected = "{id:Course1,name:Oops,description:'10 Steps'}";
 
 		// {"id":"Course1","name":"Spring","description":"10 Steps, 25 Examples and 10K Students","steps":["Learn Maven","Import Project","First Example","Second Example"]}
 
