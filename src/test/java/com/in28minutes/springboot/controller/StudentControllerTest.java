@@ -86,7 +86,7 @@ public class StudentControllerTest {
 		assertEquals(HttpStatus.CREATED.value(), response.getStatus());
 
 		assertEquals("http://localhost/students/Student1/courses/1",
-				response.getHeader(HttpHeaders.LOCATION))
+				response.getHeader(HttpHeaders.LOCATION));
 
 	}
 
