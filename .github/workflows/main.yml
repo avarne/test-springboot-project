@@ -14,27 +14,31 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  # build:
-  #   # The type of runner that the job will run on
-  #   runs-on: ubuntu-latest
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
 
-  #   # Steps represent a sequence of tasks that will be executed as part of the job
-  #   steps:
-  #     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-  #     - uses: actions/checkout@v2
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
 
-  #     # Runs a single command using the runners shell
-  #     #curl -u ibm_user:${{ secrets.JENKINSAPITOKEN }} "https://ibm-jenkins.digite.com/job/TestingPipeline/job/spring-boot-mvn-courses/build?token=junit"
-  #     - name: Run a one-line script
-  #       run: |
-  #         echo Triggering jenkins build
-  #         curl -u Digite_admin:${{ secrets.DIGITE_ADMIN }} "http://169.60.90.24:8080/job/CasPipeline/job/spring-boot-mvn-courses/build?token=springbootmvn"
+      # Runs a single command using the runners shell
+      #curl -u ibm_user:${{ secrets.JENKINSAPITOKEN }} "https://ibm-jenkins.digite.com/job/TestingPipeline/job/spring-boot-mvn-courses/build?token=junit"
+      - name: Run a one-line script
+        run: |
+          echo Triggering jenkins build
+          mvn clean build
 
-  #     # Runs a set of commands using the runners shell
-  #     - name: Run a multi-line script
-  #       run: |
-  #         echo Add other actions to build,
-  #         echo test, and deploy your project.
+      - name: Setup sonarqube
+        uses: warchant/setup-sonar-scanner@v3
+      - name: Run sonarqube
+        run: sonar-scanner
+             -Dsonar.organization=avarne 
+             -Dsonar.projectKey=test-springboot-project 
+             -Dsonar.sources=$GITHUB_WORKSPACE 
+             -Dsonar.host.url=${{ secrets.SONAR_URL }} 
+             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
   sonarQubeTrigger:
     name: SonarQube Trigger
     runs-on: ubuntu-latest
