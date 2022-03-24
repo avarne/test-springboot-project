@@ -28,7 +28,7 @@ jobs:
       - name: Run a one-line script
         run: |
           echo Triggering jenkins build
-          mvn clean build
+          mvn clean test
 
       - name: Setup sonarqube
         uses: warchant/setup-sonar-scanner@v3
@@ -39,17 +39,17 @@ jobs:
              -Dsonar.sources=$GITHUB_WORKSPACE 
              -Dsonar.host.url=${{ secrets.SONAR_URL }} 
              -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-  sonarQubeTrigger:
-    name: SonarQube Trigger
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-    - name: Setup sonarqube
-      uses: warchant/setup-sonar-scanner@v3
-    - name: Run sonarqube
-      run: sonar-scanner
-           -Dsonar.organization=avarne 
-           -Dsonar.projectKey=test-springboot-project 
-           -Dsonar.sources=$GITHUB_WORKSPACE 
-           -Dsonar.host.url=${{ secrets.SONAR_URL }} 
-           -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+  # sonarQubeTrigger:
+  #   name: SonarQube Trigger
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@master
+  #   - name: Setup sonarqube
+  #     uses: warchant/setup-sonar-scanner@v3
+  #   - name: Run sonarqube
+  #     run: sonar-scanner
+  #          -Dsonar.organization=avarne 
+  #          -Dsonar.projectKey=test-springboot-project 
+  #          -Dsonar.sources=$GITHUB_WORKSPACE 
+  #          -Dsonar.host.url=${{ secrets.SONAR_URL }} 
+  #          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
