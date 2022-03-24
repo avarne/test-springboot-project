@@ -1,59 +1,36 @@
-# This is a basic workflow to help you get started with Actions
-
-name: CI
-
-# Controls when the action will run. 
+name: Build
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master ]
- 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+    branches:
+      - master # or the name of your main branch
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
+    name: Build
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
-      # Runs a single command using the runners shell
-      #curl -u ibm_user:${{ secrets.JENKINSAPITOKEN }} "https://ibm-jenkins.digite.com/job/TestingPipeline/job/spring-boot-mvn-courses/build?token=junit"
-      - name: Run a one-line script
-        run: |
-          echo Triggering jenkins build
-          echo ${{ secrets.SONAR_TOKEN }}
-          echo ${{ secrets.SONAR_URL }} 
-      #    mvn clean test
-
-      # - name: Setup sonarqube
-      #   uses: warchant/setup-sonar-scanner@v3
-      # - name: Run sonarqube
-      #   run: |
-      #     mvn clean test
-      #     sonar-scanner
-      #      -Dsonar.organization=avarne 
-      #      -Dsonar.projectKey=test-springboot-project 
-      #      -Dsonar.sources=$GITHUB_WORKSPACE 
-      #      -Dsonar.host.url=${{ secrets.SONAR_URL }} 
-      #      -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-  # sonarQubeTrigger:
-  #   name: SonarQube Trigger
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@master
-  #   - name: Setup sonarqube
-  #     uses: warchant/setup-sonar-scanner@v3
-  #   - name: Run sonarqube
-  #     run: sonar-scanner
-  #          -Dsonar.organization=avarne 
-  #          -Dsonar.projectKey=test-springboot-project 
-  #          -Dsonar.sources=$GITHUB_WORKSPACE 
-  #          -Dsonar.host.url=${{ secrets.SONAR_URL }} 
-  #          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Cache SonarQube packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache Maven packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=avarne_test-springboot-project
